@@ -20,13 +20,29 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Static folder for frontend
+// Static folder for frontend (Keep for local dev)
 app.use(express.static(path.join(__dirname, '..')));
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/certificate_system')
-  .then(() => console.log('MongoDB Connected'))
-  .catch(err => console.log(err));
+// Optimized MongoDB Connection (Caches connection for Serverless)
+let cachedDb = null;
+const connectDB = async () => {
+    if (cachedDb) return cachedDb;
+    console.log('[DB] Connecting to Cloud MongoDB...');
+    cachedDb = await mongoose.connect(process.env.MONGODB_URI);
+    console.log('[DB] Connected Successfully');
+    return cachedDb;
+};
+
+// Middleware to ensure DB connection
+app.use(async (req, res, next) => {
+    try {
+        await connectDB();
+        next();
+    } catch (err) {
+        console.error('[DB Error]:', err);
+        res.status(500).json({ message: 'Database Connection Error' });
+    }
+});
 
 // Mount routes
 app.use('/api/admin', adminRoutes);
