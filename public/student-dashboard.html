@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - SS WebTech</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --primary-soft: #eff6ff;
+            --dark: #0f172a;
+            --darker: #020617;
+            --gray-light: #f8fafc;
+            --gray-border: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --error: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f8fafc;
+            background-image: radial-gradient(#e2e8f0 0.8px, transparent 0.8px);
+            background-size: 30px 30px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Floating Sidebar */
+        aside {
+            width: 280px;
+            background: #ffffff;
+            margin: 20px;
+            border-radius: 24px;
+            border: 1px solid var(--gray-border);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            z-index: 50;
+            animation: slideInLeft 0.6s ease-out;
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-30px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .sidebar-header {
+            padding: 35px 24px;
+            text-align: center;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .sidebar-header img {
+            height: 50px;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 25px 15px;
+            flex: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 14px;
+            gap: 15px;
+            border-radius: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 8px;
+            cursor: pointer;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+        }
+
+        .nav-item:hover {
+            color: var(--primary);
+            background: var(--primary-soft);
+        }
+
+        .nav-item.active {
+            color: #ffffff;
+            background: var(--dark);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-footer {
+            padding: 25px;
+            border-top: 1px solid var(--gray-light);
+        }
+
+        .btn-logout {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--error);
+            background: #fef2f2;
+            border: 1px solid #fee2e2;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background: var(--error);
+            color: #ffffff;
+        }
+
+        /* Main Content Area */
+        main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px 40px 40px 20px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .header-title h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--dark);
+            letter-spacing: -1px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #ffffff;
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 1px solid var(--gray-border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 14px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            padding: 24px;
+            border-radius: 24px;
+            border: 1px solid var(--gray-border);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        /* Circular Progress */
+        .progress-circle {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+        .progress-circle svg {
+            width: 60px;
+            height: 60px;
+            transform: rotate(-90deg);
+        }
+        .progress-circle circle {
+            fill: none;
+            stroke-width: 6;
+            stroke-linecap: round;
+        }
+        .progress-circle .bg { stroke: var(--gray-light); }
+        .progress-circle .progress {
+            stroke: var(--warning);
+            stroke-dasharray: 170;
+            stroke-dashoffset: 170;
+            transition: stroke-dashoffset 1s ease-out;
+        }
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--dark);
+        }
+
+        /* Profile Layout */
+        .profile-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .profile-section-card {
+            background: #ffffff;
+            padding: 35px;
+            border-radius: 32px;
+            border: 1px solid var(--gray-border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+        }
+
+        .profile-section-card h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 22px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 18px;
+            background: var(--gray-light);
+            border: 1px solid var(--gray-border);
+            border-radius: 14px;
+            font-family: inherit;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            background: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-soft);
+        }
+
+        .btn-submit {
+            background: var(--dark);
+            color: #fff;
+            padding: 14px 28px;
+            border-radius: 14px;
+            border: none;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-submit:hover {
+            background: #000;
+            transform: translateY(-2px);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 700;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-success { background: #f0fdf4; color: #10b981; border: 1px solid #dcfce7; }
+        .alert-error { background: #fef2f2; color: #ef4444; border: 1px solid #fee2e2; }
+
+        /* Course Card */
+        .course-panel {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 32px;
+            border: 1px solid var(--gray-border);
+            margin-bottom: 40px;
+            display: flex;
+            gap: 40px;
+            align-items: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+
+        .course-thumbnail {
+            width: 300px;
+            height: 180px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+        }
+
+        .course-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .btn-primary {
+            padding: 14px 28px;
+            background: var(--dark);
+            color: #ffffff;
+            border: none;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        /* Module Grid */
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .module-card {
+            background: #ffffff;
+            border: 1px solid var(--gray-border);
+            padding: 25px;
+            border-radius: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        /* Table Styling */
+        .table-responsive {
+            background: #fff;
+            border-radius: 24px;
+            border: 1px solid var(--gray-border);
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th { text-align: left; padding: 15px 20px; color: var(--text-muted); font-size: 12px; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--gray-light); }
+        td { padding: 20px; border-bottom: 1px solid var(--gray-light); font-size: 14px; font-weight: 600; }
+
+        @media (max-width: 1100px) {
+            .profile-container { grid-template-columns: 1fr; }
+            aside { width: 80px; }
+            aside span { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside>
+        <div class="sidebar-header">
+            <img src="/logo100.png" alt="SS WebTech">
+        </div>
+        <nav class="nav-list">
+            <div class="nav-item active" data-tab="dashboard">
+                <i class="fas fa-th-large"></i>
+                <span>My Dashboard</span>
+            </div>
+            <div class="nav-item" data-tab="learning-path">
+                <i class="fas fa-book"></i>
+                <span>Learning Path</span>
+            </div>
+            <div class="nav-item" data-tab="certificates">
+                <i class="fas fa-award"></i>
+                <span>Certificates</span>
+            </div>
+            <div class="nav-item" data-tab="profile">
+                <i class="fas fa-user-circle"></i>
+                <span>My Profile</span>
+            </div>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="btn-logout" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout Session</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Dashboard Tab -->
+        <section id="dashboard" class="tab-content active">
+            <header>
+                <div class="header-title">
+                    <h1 class="greeting-text">Welcome, Student!</h1>
+                    <p>Track your progress and continue your learning journey.</p>
+                </div>
+                <div class="user-profile">
+                    <div class="avatar userInitial">S</div>
+                    <div class="user-info">
+                        <span class="userNameText">Student</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #eff6ff; color: #3b82f6;">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 class="coursesCount">1</h3>
+                        <p style="color: var(--text-muted); font-size: 12px; font-weight: 700; text-transform: uppercase;">Active Courses</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: #f0fdf4; color: #10b981;">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 class="modulesCompletedCount">0</h3>
+                        <p style="color: var(--text-muted); font-size: 12px; font-weight: 700; text-transform: uppercase;">Modules Mastered</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <div class="progress-circle">
+                            <svg>
+                                <circle class="bg" cx="30" cy="30" r="27"></circle>
+                                <circle class="progress progress-ring-circle" cx="30" cy="30" r="27"></circle>
+                            </svg>
+                            <span class="progress-text progressPercent">0%</span>
+                        </div>
+                    </div>
+                    <div class="stat-info">
+                        <h3 style="font-size: 14px;">Mastery Level</h3>
+                        <p style="color: var(--text-muted); font-size: 11px; font-weight: 700; text-transform: uppercase;">Overall Progress</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="courseContainer">
+                <div style="padding: 100px; text-align: center;">
+                    <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary);"></i>
+                </div>
+            </div>
+        </section>
+
+        <!-- Certificates Tab -->
+        <section id="certificates" class="tab-content">
+            <header>
+                <div class="header-title">
+                    <h1>My Certificates</h1>
+                    <p>Download your verified internship certificates.</p>
+                </div>
+            </header>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Certificate ID</th>
+                            <th>Domain</th>
+                            <th>Date Issued</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="certificatesTableBody">
+                        <tr><td colspan="5" style="text-align: center; padding: 50px;">No certificates found yet.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Profile Tab -->
+        <section id="profile" class="tab-content">
+            <header>
+                <div class="header-title">
+                    <h1>My Profile</h1>
+                    <p>Manage your account settings and personal information.</p>
+                </div>
+            </header>
+            
+            <div class="profile-container">
+                <!-- Personal Info -->
+                <div class="profile-section-card">
+                    <h2><i class="fas fa-id-card" style="color: var(--primary);"></i> Personal Information</h2>
+                    <div class="info-row">
+                        <span class="info-label">Full Name</span>
+                        <span class="info-value userNameText">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Email Address</span>
+                        <span class="info-value" id="profileEmailText">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Account Type</span>
+                        <span class="info-value">Verified Student</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Member Since</span>
+                        <span class="info-value" id="profileJoinedText">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Student ID</span>
+                        <span class="info-value" id="profileIdText" style="font-family: monospace;">-</span>
+                    </div>
+                </div>
+
+                <!-- Change Password -->
+                <div class="profile-section-card">
+                    <h2><i class="fas fa-shield-alt" style="color: var(--warning);"></i> Security Settings</h2>
+                    <div id="passwordAlert" class="alert"></div>
+                    
+                    <form id="changePasswordForm">
+                        <div class="form-group">
+                            <label>Current Password</label>
+                            <input type="password" id="currentPassword" class="form-control" placeholder="Enter current password" required>
+                        </div>
+                        <div class="form-group">
+                            <label>New Password</label>
+                            <input type="password" id="newPassword" class="form-control" placeholder="Minimum 8 characters" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm New Password</label>
+                            <input type="password" id="confirmPassword" class="form-control" placeholder="Repeat new password" required>
+                        </div>
+                        <button type="submit" id="changePasswordBtn" class="btn-submit">
+                            <i class="fas fa-key"></i> Update Password
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const studentToken = localStorage.getItem('studentToken');
+        const studentName = localStorage.getItem('studentName');
+
+        if (!studentToken) window.location.href = '/student/login';
+
+        // Tab Switching Logic
+        const navItems = document.querySelectorAll('.nav-item');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                const targetTab = item.getAttribute('data-tab');
+                
+                // Redirect for Learning Path
+                if (targetTab === 'learning-path') {
+                    window.location.href = '/student/course';
+                    return;
+                }
+
+                navItems.forEach(nav => nav.classList.remove('active'));
+                item.classList.add('active');
+                tabContents.forEach(tab => {
+                    tab.classList.remove('active');
+                    if (tab.id === targetTab) tab.classList.add('active');
+                });
+                if (targetTab === 'certificates') loadCertificates();
+                if (targetTab === 'profile') loadProfile();
+            });
+        });
+
+        // Initialize UI
+        if (studentName) {
+            document.querySelectorAll('.userNameText').forEach(el => el.textContent = studentName);
+            document.querySelectorAll('.userInitial').forEach(el => el.textContent = studentName.charAt(0).toUpperCase());
+            document.querySelector('.greeting-text').textContent = `Welcome, ${studentName.split(' ')[0]}!`;
+        }
+
+        document.getElementById('logoutBtn').onclick = () => {
+            localStorage.removeItem('studentToken');
+            localStorage.removeItem('studentName');
+            window.location.href = '/student/login';
+        };
+
+        async function loadData() {
+            try {
+                const res = await fetch('/api/lms/course', {
+                    headers: { 'Authorization': `Bearer ${studentToken}` }
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    renderCourse(data.course);
+                    
+                    const totalModules = data.modules.length;
+                    const completedModulesCount = data.progress?.completedModules?.length || 0;
+                    const percentage = totalModules > 0 ? Math.round((completedModulesCount / totalModules) * 100) : 0;
+
+                    document.querySelector('.coursesCount').textContent = data.course ? 1 : 0;
+                    document.querySelector('.modulesCompletedCount').textContent = `${completedModulesCount} / ${totalModules}`;
+                    
+                    // Update Progress Ring
+                    const ring = document.querySelector('.progress-ring-circle');
+                    const percentText = document.querySelector('.progressPercent');
+                    percentText.textContent = `${percentage}%`;
+                    
+                    const offset = 170 - (percentage / 100) * 170;
+                    if (ring) ring.style.strokeDashoffset = offset;
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        function renderCourse(course) {
+            const container = document.getElementById('courseContainer');
+            container.innerHTML = `
+                <div class="course-panel">
+                    <div class="course-thumbnail">
+                        <img src="${course.thumbnail || 'https://images.unsplash.com/photo-1498050108023-c5249f4df085'}" alt="${course.title}">
+                    </div>
+                    <div class="course-details">
+                        <span style="color: var(--primary); font-weight: 800; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 10px;">Ongoing Course</span>
+                        <h2 style="font-family: 'Space Grotesk'; font-size: 28px; margin-bottom: 15px;">${course.title}</h2>
+                        <p style="color: var(--text-muted); margin-bottom: 25px; line-height: 1.6;">${course.description}</p>
+                        <a href="/student/course" class="btn-primary">
+                            <i class="fas fa-play"></i> Resume Learning
+                        </a>
+                    </div>
+                </div>
+            `;
+        }
+
+
+
+        async function loadCertificates() {
+            const tbody = document.getElementById('certificatesTableBody');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 50px;"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
+            try {
+                const res = await fetch('/api/students/certificates', {
+                    headers: { 'Authorization': `Bearer ${studentToken}` }
+                });
+                const certs = await res.json();
+                if (certs.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 50px;">No certificates found yet. Complete your course to receive one!</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = certs.map(c => `
+                    <tr>
+                        <td style="font-family: monospace; font-weight: 800; color: var(--primary);">${c.certificateId}</td>
+                        <td>${c.internshipDomain}</td>
+                        <td>${new Date(c.issueDate).toLocaleDateString()}</td>
+                        <td><span style="padding: 5px 12px; border-radius: 50px; font-size: 11px; background: #f0fdf4; color: #10b981; border: 1px solid #dcfce7;">ACTIVE</span></td>
+                        <td><a href="/api/certificates/${c.certificateId}/pdf" class="btn-primary" style="padding: 8px 15px; font-size: 12px;"><i class="fas fa-download"></i> PDF</a></td>
+                    </tr>
+                `).join('');
+            } catch (err) { tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 50px; color: var(--error);">Error loading certificates.</td></tr>'; }
+        }
+
+        async function loadProfile() {
+            try {
+                const res = await fetch('/api/students/profile', {
+                    headers: { 'Authorization': `Bearer ${studentToken}` }
+                });
+                const profile = await res.json();
+                if (res.ok) {
+                    document.getElementById('profileEmailText').textContent = profile.email;
+                    document.getElementById('profileJoinedText').textContent = new Date(profile.createdAt).toLocaleDateString();
+                    document.getElementById('profileIdText').textContent = profile._id;
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        // Change Password Logic
+        document.getElementById('changePasswordForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const alert = document.getElementById('passwordAlert');
+            const btn = document.getElementById('changePasswordBtn');
+            const current = document.getElementById('currentPassword').value;
+            const newPass = document.getElementById('newPassword').value;
+            const confirm = document.getElementById('confirmPassword').value;
+
+            if (newPass !== confirm) {
+                alert.className = 'alert alert-error';
+                alert.textContent = 'New passwords do not match';
+                alert.style.display = 'block';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Updating...';
+
+            try {
+                const res = await fetch('/api/students/change-password', {
+                    method: 'PUT',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${studentToken}`
+                    },
+                    body: JSON.stringify({ currentPassword: current, newPassword: newPass })
+                });
+                const data = await res.json();
+
+                if (res.ok) {
+                    alert.className = 'alert alert-success';
+                    alert.textContent = 'Password updated successfully!';
+                    document.getElementById('changePasswordForm').reset();
+                } else {
+                    alert.className = 'alert alert-error';
+                    alert.textContent = data.message || 'Update failed';
+                }
+            } catch (error) {
+                alert.className = 'alert alert-error';
+                alert.textContent = 'Server error. Please try again.';
+            } finally {
+                alert.style.display = 'block';
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-key"></i> Update Password';
+            }
+        };
+
+        loadData();
+    </script>
+</body>
+</html>

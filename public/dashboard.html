@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SS WebTech</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --primary-soft: #eff6ff;
+            --dark: #0f172a;
+            --darker: #020617;
+            --gray-light: #f8fafc;
+            --gray-border: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --error: #ef4444;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --glass: rgba(255, 255, 255, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f8fafc;
+            /* Same subtle geometric pattern as login */
+            background-image: radial-gradient(#e2e8f0 0.8px, transparent 0.8px);
+            background-size: 30px 30px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Modern Floating Sidebar */
+        aside {
+            width: 280px;
+            background: #ffffff;
+            margin: 20px;
+            border-radius: 24px;
+            border: 1px solid var(--gray-border);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            z-index: 50;
+            animation: slideInLeft 0.6s ease-out;
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-30px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .sidebar-header {
+            padding: 35px 24px;
+            text-align: center;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        .sidebar-header img {
+            height: 50px;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header img:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 25px 15px;
+            flex: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 20px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 14px;
+            gap: 15px;
+            border-radius: 14px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 8px;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            transition: transform 0.3s ease;
+        }
+
+        .nav-item:hover {
+            color: var(--primary);
+            background: var(--primary-soft);
+        }
+
+        .nav-item:hover i {
+            transform: translateX(3px);
+        }
+
+        .nav-item.active {
+            color: #ffffff;
+            background: var(--dark);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-footer {
+            padding: 25px;
+            border-top: 1px solid var(--gray-light);
+        }
+
+        .btn-logout {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--error);
+            background: #fef2f2;
+            border: 1px solid #fee2e2;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background: var(--error);
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+        }
+
+        /* Main Content Area */
+        main {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px 40px 40px 20px;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .header-title h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--dark);
+            letter-spacing: -1px;
+        }
+
+        .header-title p {
+            color: var(--text-muted);
+            font-size: 15px;
+            margin-top: 4px;
+            font-weight: 500;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #ffffff;
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 1px solid var(--gray-border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .user-profile:hover {
+            transform: scale(1.02);
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--dark), #1e293b);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-weight: 800;
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .user-info span {
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--dark);
+        }
+
+        /* Premium Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 28px;
+            border: 1px solid var(--gray-border);
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle at center, currentColor, transparent 70%);
+            opacity: 0.05;
+            transform: translate(30%, -30%);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+
+        .stat-icon {
+            width: 65px;
+            height: 65px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
+
+        .icon-total { background: #eff6ff; color: #3b82f6; }
+        .icon-active { background: #f0fdf4; color: #10b981; }
+        .icon-revoked { background: #fef2f2; color: #ef4444; }
+
+        .stat-info h3 {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--dark);
+            line-height: 1;
+        }
+
+        .stat-info p {
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        /* Glass Content Panel */
+        .content-panel {
+            background: #ffffff;
+            padding: 35px;
+            border-radius: 32px;
+            border: 1px solid var(--gray-border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+            animation: cardFadeUp 0.6s ease-out;
+        }
+
+        @keyframes cardFadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .panel-header h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .btn-primary {
+            padding: 14px 28px;
+            background: var(--dark);
+            color: #ffffff;
+            border: none;
+            border-radius: 14px;
+            font-weight: 800;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary:hover {
+            background: #000000;
+            transform: translateY(-2px);
+            box-shadow: 0 15px 20px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Modern Table Styling */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+
+        th {
+            padding: 15px 20px;
+            text-align: left;
+            color: var(--text-muted);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            font-weight: 800;
+            border-bottom: 1px solid var(--gray-light);
+        }
+
+        td {
+            padding: 20px;
+            background: #ffffff;
+            border-top: 1px solid var(--gray-light);
+            border-bottom: 1px solid var(--gray-light);
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        td:first-child { border-left: 1px solid var(--gray-light); border-radius: 16px 0 0 16px; }
+        td:last-child { border-right: 1px solid var(--gray-light); border-radius: 0 16px 16px 0; }
+
+        tr:hover td {
+            background: var(--gray-light);
+            border-color: var(--gray-border);
+        }
+
+        .cert-id-cell {
+            font-family: monospace;
+            font-weight: 800;
+            color: var(--primary);
+            font-size: 15px;
+        }
+
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 50px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-active { background: #f0fdf4; color: #10b981; border: 1px solid #dcfce7; }
+        .status-revoked { background: #fef2f2; color: #ef4444; border: 1px solid #fee2e2; }
+
+        .action-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--gray-border);
+            background: #ffffff;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .btn-icon:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-soft);
+            transform: scale(1.1);
+        }
+
+        /* Advanced Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            width: 100%;
+            max-width: 700px;
+            border-radius: 32px;
+            padding: 40px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .modal-header h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 26px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .close-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--gray-light);
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            background: var(--error);
+            color: #ffffff;
+            transform: rotate(90deg);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 18px;
+            background: var(--gray-light);
+            border: 1px solid var(--gray-border);
+            border-radius: 14px;
+            color: var(--text-main);
+            font-family: inherit;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            background: #ffffff;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-soft);
+        }
+
+        .modal-footer {
+            margin-top: 40px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
+        .btn-secondary {
+            padding: 14px 28px;
+            background: var(--gray-light);
+            color: var(--text-main);
+            border: 1px solid var(--gray-border);
+            border-radius: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-border);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--gray-light); }
+        ::-webkit-scrollbar-thumb { background: var(--gray-border); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <aside>
+        <div class="sidebar-header">
+            <img src="logo100.png" alt="SS WebTech">
+        </div>
+        <nav class="nav-list">
+            <a href="#" class="nav-item active">
+                <i class="fas fa-th-large"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" id="newCertBtn">
+                <i class="fas fa-plus-square"></i>
+                <span>Generate New</span>
+            </a>
+            <a href="#" class="nav-item" data-tab="students">
+                <i class="fas fa-user-graduate"></i>
+                <span>Student Access</span>
+            </a>
+            <a href="verify.html" target="_blank" class="nav-item">
+                <i class="fas fa-qrcode"></i>
+                <span>Verify Portal</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <button class="btn-logout" id="logoutBtn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout Session</span>
+            </button>
+        </div>
+    </aside>
+
+    <main>
+        <header>
+            <div class="header-title">
+                <h1>Admin Dashboard</h1>
+                <p>Welcome back! Here's what's happening today.</p>
+            </div>
+            <div class="user-profile">
+                <div class="avatar" id="userInitial">A</div>
+                <div class="user-info">
+                    <span id="userName">Admin</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card" style="color: #3b82f6;">
+                <div class="stat-icon icon-total">
+                    <i class="fas fa-award"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="totalCerts">0</h3>
+                    <p>Total Certificates</p>
+                </div>
+            </div>
+            <div class="stat-card" style="color: #10b981;">
+                <div class="stat-icon icon-active">
+                    <i class="fas fa-check-double"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="activeCerts">0</h3>
+                    <p>Active Credentials</p>
+                </div>
+            </div>
+            <div class="stat-card" style="color: #ef4444;">
+                <div class="stat-icon icon-revoked">
+                    <i class="fas fa-ban"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="revokedCerts">0</h3>
+                    <p>Revoked Access</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-panel">
+            <div class="panel-header">
+                <h2>Issued Certificates</h2>
+                <button class="btn-primary" id="panelNewBtn">
+                    <i class="fas fa-plus"></i> Generate Certificate
+                </button>
+            </div>
+            <div class="content-body">
+            <!-- Certificates Tab -->
+            <section id="certificatesTab" class="tab-content">
+                <div class="table-responsive" style="position: relative;">
+                    <div id="tableLoader" class="loading-overlay" style="display: none; position: absolute; inset: 0; background: rgba(255,255,255,0.7); z-index: 10; align-items: center; justify-content: center;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 30px; color: var(--primary);"></i>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Certificate ID</th>
+                                <th>Student Details</th>
+                                <th>Domain</th>
+                                <th>Date Issued</th>
+                                <th>Status</th>
+                                <th>Quick Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="certsTableBody">
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 100px;">
+                                    <i class="fas fa-spinner fa-spin" style="font-size: 30px; color: var(--gray-border);"></i>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Students Tab -->
+            <section id="studentsTab" class="tab-content" style="display: none;">
+                <div class="stats-grid" style="margin-bottom: 30px;">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: var(--primary-soft); color: var(--primary);">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="totalStudents">0</h3>
+                            <p>Total Registered</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: #f0fdf4; color: #10b981;">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="approvedStudents">0</h3>
+                            <p>Active Learners</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div class="table-header" style="padding: 0 0 20px 0;">
+                        <h2>Manage Student Access</h2>
+                        <div class="table-actions">
+                            <button class="btn-secondary" onclick="fetchStudents()">
+                                <i class="fas fa-sync"></i> Refresh List
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Student Name</th>
+                                    <th>Email Address</th>
+                                    <th>Course Progress</th>
+                                    <th>Final Project</th>
+                                    <th>Registered On</th>
+                                    <th>Access Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentsTableBody">
+                                <!-- Loaded via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="certModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Create Certificate</h2>
+                <button class="close-btn" id="closeModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="certForm">
+                <input type="hidden" id="editCertId">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Student Full Name</label>
+                        <input type="text" id="studentName" class="form-control" placeholder="Enter student name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Student Email (for Login matching)</label>
+                        <input type="email" id="studentEmail" class="form-control" placeholder="Enter student email" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Internship Domain</label>
+                        <input type="text" id="domain" class="form-control" placeholder="e.g. Web Development" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Internship Duration</label>
+                        <input type="text" id="duration" class="form-control" placeholder="e.g. 3 Months" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Start Date</label>
+                        <input type="date" id="startDate" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>End Date</label>
+                        <input type="date" id="endDate" class="form-control" required>
+                    </div>
+                    <div class="form-group full-width" id="statusGroup" style="display: none;">
+                        <label>Credential Status</label>
+                        <select id="status" class="form-control">
+                            <option value="Active">Active / Valid</option>
+                            <option value="Revoked">Revoked / Invalid</option>
+                        </select>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Project/Custom Description</label>
+                        <textarea id="description" class="form-control" rows="4" placeholder="Optional: Add details about projects or performance..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn-primary" id="saveBtn">Save & Generate</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Official Verification Portal - SS WebTech</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.5);
+            --secondary: #8b5cf6;
+            --dark: #0f172a;
+            --darker: #020617;
+            --light: #ffffff;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --success: #10b981;
+            --error: #ef4444;
+            --gold: #d4af37;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #030014;
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: absolute;
+            top: -10%;
+            left: -10%;
+            width: 120%;
+            height: 120%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(59, 130, 246, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.1) 0%, transparent 40%);
+            z-index: -1;
+            animation: bgMove 20s infinite alternate linear;
+        }
+
+        @keyframes bgMove {
+            from { transform: translate(0, 0); }
+            to { transform: translate(-2%, -2%); }
+        }
+
+        /* Abstract shapes */
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.4;
+        }
+        .shape-1 { width: 300px; height: 300px; background: var(--primary); top: 10%; right: 10%; }
+        .shape-2 { width: 400px; height: 400px; background: var(--secondary); bottom: 10%; left: 5%; }
+
+        .container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            z-index: 1;
+        }
+
+        .verify-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            width: 100%;
+            max-width: 650px;
+            border-radius: 40px;
+            padding: 60px;
+            box-shadow: 
+                0 0 0 1px rgba(255, 255, 255, 0.1),
+                0 30px 60px -12px rgba(0, 0, 0, 0.5),
+                0 0 40px rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            text-align: center;
+            animation: cardReveal 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes cardReveal {
+            from { opacity: 0; transform: translateY(40px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .branding-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 35px;
+            margin-bottom: 40px;
+        }
+
+        .branding-row img {
+            height: 65px;
+            width: auto;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+            transition: transform 0.3s ease;
+        }
+
+        .branding-row img:hover {
+            transform: scale(1.05);
+        }
+
+        .divider {
+            width: 1px;
+            height: 45px;
+            background: linear-gradient(to bottom, transparent, var(--gray-200), transparent);
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--darker);
+            margin-bottom: 15px;
+            letter-spacing: -1.5px;
+            background: linear-gradient(135deg, var(--darker) 0%, #475569 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 17px;
+            margin-bottom: 45px;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+
+        /* Search Section */
+        .input-wrapper {
+            background: var(--gray-100);
+            padding: 10px;
+            border-radius: 24px;
+            display: flex;
+            gap: 10px;
+            border: 2px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .input-wrapper:focus-within {
+            background: #ffffff;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 5px var(--primary-glow);
+            transform: translateY(-2px);
+        }
+
+        .form-control {
+            flex: 1;
+            padding: 15px 20px;
+            background: transparent;
+            border: none;
+            font-family: inherit;
+            font-size: 17px;
+            font-weight: 600;
+            outline: none;
+            color: var(--dark);
+        }
+
+        .btn-verify {
+            background: var(--dark);
+            color: #ffffff;
+            border: none;
+            padding: 0 35px;
+            border-radius: 18px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+        }
+
+        .btn-verify:hover {
+            background: var(--darker);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            transform: scale(1.02);
+        }
+
+        /* Result View Improvements */
+        .result-view {
+            display: none;
+            animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 40px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .status-badge.valid { 
+            background: #f0fdf4; 
+            color: var(--success); 
+            border: 2px solid #dcfce7;
+            animation: pulseSuccess 2s infinite;
+        }
+
+        @keyframes pulseSuccess {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .cert-details-card {
+            background: #f8fafc;
+            border: 1px solid var(--gray-200);
+            border-radius: 30px;
+            padding: 40px;
+            text-align: left;
+            position: relative;
+            margin-bottom: 35px;
+            transition: all 0.3s;
+        }
+
+        .cert-details-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 15px 30px -10px rgba(0,0,0,0.05);
+        }
+
+        .cert-details-card::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0; width: 100px; height: 100px;
+            background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.05), transparent);
+            border-radius: 0 30px 0 0;
+        }
+
+        .detail-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .detail-row:last-child { margin-bottom: 0; }
+
+        .detail-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 8px;
+        }
+
+        .detail-group p {
+            font-size: 19px;
+            font-weight: 800;
+            color: var(--dark);
+        }
+
+        .id-pill {
+            display: inline-block;
+            padding: 8px 16px;
+            background: var(--dark);
+            color: #ffffff;
+            border-radius: 12px;
+            font-family: 'Space Grotesk', monospace;
+            font-weight: 600;
+            font-size: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .new-search-btn {
+            background: transparent;
+            color: var(--text-main);
+            border: 2px solid var(--gray-200);
+            padding: 18px 30px;
+            border-radius: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .new-search-btn:hover {
+            background: var(--gray-100);
+            border-color: var(--text-muted);
+        }
+
+        .loader {
+            display: none;
+            margin: 40px auto;
+            width: 45px;
+            height: 45px;
+            border: 4px solid var(--gray-100);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        footer {
+            text-align: center;
+            padding: 40px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 650px) {
+            .verify-card { padding: 40px 25px; border-radius: 30px; margin: 10px; }
+            .detail-row { grid-template-columns: 1fr; gap: 20px; }
+            h1 { font-size: 28px; }
+            .branding-row img { height: 50px; }
+            .branding-row { gap: 20px; }
+            .subtitle { font-size: 15px; margin-bottom: 30px; }
+        }
+
+        @media (max-width: 480px) {
+            .input-wrapper { flex-direction: column; background: transparent; padding: 0; box-shadow: none; }
+            .form-control { background: var(--gray-100); border-radius: 15px; margin-bottom: 10px; border: 2px solid var(--gray-200); }
+            .form-control:focus { background: #fff; }
+            .btn-verify { width: 100%; padding: 18px; justify-content: center; border-radius: 15px; }
+            .verify-card { padding: 30px 20px; }
+            .cert-details-card { padding: 25px; border-radius: 20px; }
+            .detail-group p { font-size: 17px; }
+            .branding-row img { height: 40px; }
+            .divider { height: 30px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+
+    <div class="container">
+        <div class="verify-card">
+            <!-- Branding Header -->
+            <div class="branding-row">
+                <img src="logo100.png" alt="SS WebTech">
+                <div class="divider"></div>
+                <img src="image.png" alt="MSME Logo">
+            </div>
+
+            <!-- Search View -->
+            <div id="searchView">
+                <h1>Certificate Verification</h1>
+                <p class="subtitle">Securely verify and authenticate internship credentials issued by SS WebTech.</p>
+                
+                <div class="input-wrapper">
+                    <input type="text" id="certIdInput" class="form-control" placeholder="Enter Certificate ID (e.g. SSW-2026-0001)">
+                    <button class="btn-verify" id="verifyBtn">
+                        <i class="fas fa-shield-check"></i> Verify Now
+                    </button>
+                </div>
+                <div class="loader" id="loader"></div>
+                <div id="errorBox" style="display: none; margin-top: 25px; color: var(--error); font-weight: 700; font-size: 15px;"></div>
+            </div>
+
+            <!-- Result View -->
+            <div id="resultView" class="result-view">
+                <div id="statusBadge" class="status-badge valid">
+                    <i class="fas fa-badge-check"></i>
+                    <span>Official Credential Verified</span>
+                </div>
+
+                <div class="cert-details-card">
+                    <div class="detail-row">
+                        <div class="detail-group">
+                            <label>Full Name</label>
+                            <p id="resName">-</p>
+                        </div>
+                        <div class="detail-group">
+                            <label>Domain</label>
+                            <p id="resDomain">-</p>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-group">
+                            <label>Duration</label>
+                            <p id="resDuration">-</p>
+                        </div>
+                        <div class="detail-group">
+                            <label>Certificate ID</label>
+                            <div class="id-pill" id="resId">-</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: center;">
+                    <button class="new-search-btn" onclick="resetView()" style="width: 100%;">
+                        <i class="fas fa-rotate"></i> Verify Another Certificate
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2026 SS WebTech. All Data is Cryptographically Verified.
+    </footer>
+
+    <script>
+        const verifyBtn = document.getElementById('verifyBtn');
+        const certIdInput = document.getElementById('certIdInput');
+        const searchView = document.getElementById('searchView');
+        const resultView = document.getElementById('resultView');
+        const errorBox = document.getElementById('errorBox');
+        const loader = document.getElementById('loader');
+
+        // URL direct access
+        const urlParams = new URLSearchParams(window.location.search);
+        const idParam = urlParams.get('id');
+        if (idParam) {
+            certIdInput.value = idParam;
+            verifyCertificate(idParam);
+        }
+
+        verifyBtn.onclick = () => {
+            const id = certIdInput.value.trim();
+            if (id) verifyCertificate(id);
+        };
+
+        // Allow Enter key
+        certIdInput.onkeyup = (e) => {
+            if (e.key === 'Enter') verifyBtn.click();
+        };
+
+        async function verifyCertificate(id) {
+            errorBox.style.display = 'none';
+            loader.style.display = 'block';
+
+            try {
+                const res = await fetch(`/api/certificates/${id}`);
+                if (!res.ok) throw new Error('Not found');
+                
+                const data = await res.json();
+                
+                if (data.status === 'Revoked') {
+                    showStatus('revoked', data);
+                } else {
+                    showStatus('valid', data);
+                }
+            } catch (error) {
+                errorBox.textContent = "Invalid ID. No record found in our database.";
+                errorBox.style.display = 'block';
+            } finally {
+                loader.style.display = 'none';
+            }
+        }
+
+        function showStatus(status, data) {
+            document.getElementById('resName').textContent = data.studentName;
+            document.getElementById('resDomain').textContent = data.internshipDomain;
+            document.getElementById('resDuration').textContent = data.duration;
+            document.getElementById('resId').textContent = data.certificateId;
+
+            const badge = document.getElementById('statusBadge');
+
+            if (status === 'revoked') {
+                badge.className = 'status-badge' + ' revoked'; // I'll add revoked style in a sec
+                badge.style.background = '#fef2f2';
+                badge.style.color = '#ef4444';
+                badge.style.borderColor = '#fee2e2';
+                badge.innerHTML = '<i class="fas fa-ban"></i><span>Credential Revoked</span>';
+            } else {
+                badge.className = 'status-badge valid';
+                badge.innerHTML = '<i class="fas fa-badge-check"></i><span>Official Credential Verified</span>';
+            }
+
+            searchView.style.display = 'none';
+            resultView.style.display = 'block';
+        }
+
+        function resetView() {
+            resultView.style.display = 'none';
+            searchView.style.display = 'block';
+            certIdInput.value = '';
+            errorBox.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

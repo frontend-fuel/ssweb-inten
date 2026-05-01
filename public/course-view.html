@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Portal - SS WebTech</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Markdown & Highlighting -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-soft: #eff6ff;
+            --ai-accent: #8b5cf6;
+            --dark: #0f172a;
+            --gray-border: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: #f8fafc;
+            background-image: radial-gradient(#e2e8f0 0.8px, transparent 0.8px);
+            background-size: 30px 30px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        aside {
+            width: 320px;
+            background: #ffffff;
+            margin: 20px;
+            border-radius: 24px;
+            border: 1px solid var(--gray-border);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            z-index: 50;
+            overflow-y: auto;
+        }
+
+        .sidebar-header { padding: 30px 24px; border-bottom: 1px solid var(--gray-border); }
+        .back-link { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text-muted); font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px; }
+
+        .week-container { margin-bottom: 25px; padding: 0 15px; }
+        .week-header { padding: 10px 15px; font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 800; color: var(--primary); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
+        .module-item { margin-top: 10px; }
+        .module-header { padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: #f8fafc; border-radius: 12px; font-weight: 700; font-size: 13px; color: var(--dark); transition: all 0.3s; border: 1px solid transparent; }
+        .module-header.locked { opacity: 0.5; cursor: not-allowed; }
+        
+        .lesson-list { margin-top: 8px; padding-left: 10px; }
+        .lesson-item { padding: 10px 15px; border-radius: 10px; font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.2s; }
+        .lesson-item.locked { opacity: 0.4; cursor: not-allowed; }
+        .lesson-item.completed { color: #10b981; }
+        .lesson-item.active { background: var(--dark); color: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+        .quiz-item { padding: 12px 15px; background: #fffbeb; color: #d97706; border-radius: 10px; font-weight: 800; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 10px; margin-top: 8px; }
+        .quiz-item.locked { opacity: 0.4; cursor: not-allowed; }
+
+        main { flex: 1; margin: 20px 20px 20px 0; background: #ffffff; border-radius: 24px; border: 1px solid var(--gray-border); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); overflow-y: auto; }
+        .content-inner { padding: 60px 10%; }
+
+        .premium-title { font-family: 'Space Grotesk', sans-serif; font-size: 42px; font-weight: 700; margin-bottom: 35px; color: var(--dark); letter-spacing: -1.5px; }
+        .concept-card { background: #f8fafc; border: 1px solid var(--gray-border); border-radius: 20px; padding: 30px; margin: 25px 0; line-height: 1.8; font-size: 17px; }
+        .code-block { background: #0f172a; color: #f1f5f9; padding: 40px 30px 30px; border-radius: 20px; font-family: 'Fira Code', monospace; margin: 30px 0; position: relative; }
+        .code-block::before { content: ''; position: absolute; top: 15px; left: 20px; width: 10px; height: 10px; background: #ff5f56; border-radius: 50%; box-shadow: 20px 0 0 #ffbd2e, 40px 0 0 #27c93f; }
+
+        .ai-body h1, .ai-body h2, .ai-body h3 { font-family: 'Space Grotesk', sans-serif; margin-top: 40px; margin-bottom: 20px; color: var(--dark); }
+        .ai-body p { margin-bottom: 20px; line-height: 1.8; color: var(--text-main); font-size: 16px; }
+        .ai-body ul, .ai-body ol { margin-bottom: 25px; padding-left: 20px; }
+        .ai-body li { margin-bottom: 12px; line-height: 1.6; }
+        .ai-body pre { background: #0f172a; padding: 25px; border-radius: 20px; margin: 30px 0; overflow-x: auto; border: 1px solid rgba(255,255,255,0.1); }
+        .ai-body code { font-family: 'Fira Code', monospace; font-size: 14px; }
+        .ai-body blockquote { border-left: 4px solid var(--primary); padding: 20px 30px; background: var(--primary-soft); border-radius: 0 20px 20px 0; margin: 30px 0; font-style: italic; color: var(--dark); }
+        .ai-body table { width: 100%; border-collapse: collapse; margin: 30px 0; border-radius: 16px; overflow: hidden; border: 1px solid var(--gray-border); }
+        .ai-body th { background: #f8fafc; padding: 15px; text-align: left; font-weight: 800; font-size: 13px; text-transform: uppercase; border-bottom: 2px solid var(--gray-border); }
+        .ai-body td { padding: 15px; border-bottom: 1px solid var(--gray-border); font-size: 14px; }
+        
+        /* Pro Tip & Mastery Challenge Styling */
+        .ai-body h3 { 
+            color: var(--primary); 
+            border-bottom: 2px solid var(--primary-soft); 
+            padding-bottom: 10px;
+            display: inline-block;
+        }
+        .ai-body blockquote { 
+            border-left: 5px solid var(--ai-accent); 
+            padding: 25px 35px; 
+            background: #fdf2ff; 
+            border-radius: 12px 24px 24px 12px; 
+            margin: 40px 0; 
+            font-style: normal;
+            font-weight: 500;
+            color: #4b5563;
+            box-shadow: inset 0 0 20px rgba(139, 92, 246, 0.05);
+        }
+
+        .navigation-footer { display: flex; justify-content: space-between; margin-top: 60px; padding-top: 40px; border-top: 1px solid var(--gray-border); gap: 20px; }
+        .btn-nav { flex: 1; padding: 20px 30px; background: #fff; border: 2px solid var(--gray-border); border-radius: 20px; color: var(--dark); font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 15px; transition: all 0.3s; }
+        .btn-nav.next { background: var(--dark); color: #fff; border-color: var(--dark); }
+        .btn-nav:disabled { opacity: 0.3; cursor: not-allowed; }
+
+        .ai-loading { text-align: center; margin-top: 150px; }
+        .ai-pulse { width: 80px; height: 80px; background: var(--ai-accent); border-radius: 50%; margin: 0 auto 30px; animation: pulse 2s infinite; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 30px; }
+        @keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(139, 92, 246, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(139, 92, 246, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(139, 92, 246, 0); } }
+
+        .btn-action { padding: 16px 32px; background: var(--dark); color: #fff; border: none; border-radius: 16px; font-weight: 800; cursor: pointer; width: 100%; margin-top: 40px; font-family: 'Space Grotesk', sans-serif; transition: all 0.3s; }
+        .btn-action:hover { background: #000; transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .btn-action:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-content { background: #fff; padding: 40px; border-radius: 32px; max-width: 500px; text-align: center; }
+        .quiz-option { padding: 18px 24px; border: 2px solid var(--gray-border); border-radius: 16px; margin-bottom: 12px; cursor: pointer; font-weight: 600; transition: all 0.2s; }
+        .quiz-option.selected { background: var(--dark); color: #fff; border-color: var(--dark); }
+    </style>
+</head>
+<body>
+    <aside>
+        <div class="sidebar-header" style="text-align: center; padding: 25px 20px;">
+            <img src="/logo100.png" alt="SS WebTech" style="height: 50px; margin-bottom: 20px;">
+            <a href="/student/dashboard" class="back-link" style="display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; background: #f8fafc; border: 1px solid var(--gray-border); padding: 10px; border-radius: 12px; color: var(--text-muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.3s;">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+        <nav id="sidebarWeeks" style="padding-top: 10px;"></nav>
+    </aside>
+
+    <main>
+        <div class="content-inner" id="lessonContent">
+            <div style="text-align: center; margin-top: 150px; opacity: 0.5;">
+                <i class="fas fa-unlock-alt fa-4x" style="color: var(--primary); margin-bottom: 20px;"></i>
+                <h2>One-by-One Unlocking</h2>
+                <p>Complete each lesson to unlock the next chapter of your journey.</p>
+            </div>
+        </div>
+    </main>
+
+    <div id="quizModal" class="modal">
+        <div class="modal-content">
+            <div id="modalIcon" style="font-size: 60px; margin-bottom: 20px;"></div>
+            <h2 id="modalTitle"></h2>
+            <p id="modalMessage" style="margin: 20px 0; font-size: 18px; font-weight: 600;"></p>
+            <div id="modalScore" style="font-size: 32px; font-weight: 800; color: var(--primary); margin-bottom: 30px;"></div>
+            <button onclick="window.location.reload()" class="btn-nav next" style="width: 100%;">Continue</button>
+        </div>
+    </div>
+
+    <script>
+        const studentToken = localStorage.getItem('studentToken');
+        if (!studentToken) window.location.href = '/student/login';
+
+        let courseData = null;
+        let activeLessonId = null;
+
+        function escapeHTML(str) { return str.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m])); }
+
+        async function init() {
+            const res = await fetch('/api/lms/course', { headers: { 'Authorization': `Bearer ${studentToken}` } });
+            courseData = await res.json();
+            renderSidebar();
+            renderLearningPath(); // Show roadmap on landing
+        }
+
+        function renderLearningPath() {
+            const container = document.getElementById('lessonContent');
+            const weeks = {};
+            courseData.modules.forEach(m => {
+                if (!weeks[m.week]) weeks[m.week] = [];
+                weeks[m.week].push(m);
+            });
+
+            container.innerHTML = `
+                <div class="syllabus-view" style="text-align: center;">
+                    <img src="/logo.png" alt="SS WebTech" style="height: 150px; margin-bottom: 30px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1));">
+                    <br>
+                    <span style="color: var(--primary); font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 2px;">Professional Journey</span>
+                    <h1 class="premium-title" style="margin-top: 10px;">Learning Path</h1>
+                    <p style="color: var(--text-muted); margin-bottom: 50px; font-size: 18px; max-width: 600px; margin-left: auto; margin-right: auto;">Your professional 8-week journey to becoming a Senior Full Stack Developer.</p>
+                    
+                    <div class="syllabus-grid">
+                        ${Object.keys(weeks).sort((a, b) => a - b).map(weekNum => `
+                            <div class="syllabus-week" style="margin-bottom: 40px; text-align: left;">
+                                <h3 style="font-family: 'Space Grotesk'; font-size: 20px; margin-bottom: 20px; color: var(--primary); text-align: center;">Week ${weekNum}</h3>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; justify-content: center;">
+                                    ${weeks[weekNum].map(m => `
+                                        <div class="concept-card" style="margin: 0; padding: 20px; cursor: pointer; transition: all 0.3s;" 
+                                             onclick="toggleModule('${m._id}')">
+                                            <h4 style="font-size: 15px; margin-bottom: 10px;">${m.title}</h4>
+                                            <span style="font-size: 12px; color: var(--text-muted);">${m.lessons.length} Lessons</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSidebar() {
+            const sidebar = document.getElementById('sidebarWeeks');
+            const weeks = {};
+            courseData.modules.forEach(m => {
+                if (!weeks[m.week]) weeks[m.week] = [];
+                weeks[m.week].push(m);
+            });
+
+            const completedLessons = courseData.progress?.completedLessons || [];
+            const completedModules = courseData.progress?.completedModules || [];
+
+            sidebar.innerHTML = Object.keys(weeks).sort((a, b) => a - b).map((weekNum, wIdx) => {
+                const modulesInWeek = weeks[weekNum];
+                
+                // Week 1 is unlocked by default. Subsequent weeks require the last module of the previous week to be completed.
+                let weekLocked = false;
+                if (weekNum > 1) {
+                    const prevWeekNum = Object.keys(weeks)[wIdx - 1];
+                    const lastModOfPrevWeek = weeks[prevWeekNum].slice(-1)[0];
+                    if (!completedModules.includes(lastModOfPrevWeek._id)) {
+                        weekLocked = true;
+                    }
+                }
+
+                return `
+                <div class="week-container">
+                    <div class="week-header"><i class="fas fa-calendar-week"></i> Week ${weekNum}</div>
+                    ${modulesInWeek.map((m, mIdx) => {
+                        // Module 1 of Week 1 is unlocked. 
+                        // Others depend on the last lesson of the previous module (in the same week) or previous week completion.
+                        let mLocked = weekLocked;
+                        if (!mLocked && mIdx > 0) {
+                            const prevMod = modulesInWeek[mIdx-1];
+                            const lastLessonOfPrevMod = prevMod.lessons[prevMod.lessons.length - 1];
+                            if (!completedLessons.includes(lastLessonOfPrevMod._id)) {
+                                mLocked = true;
+                            }
+                        }
+
+                        return `
+                        <div class="module-item">
+                            <div class="module-header ${mLocked ? 'locked' : ''}" onclick="${mLocked ? '' : `toggleModule('${m._id}')`}">
+                                <span>${m.title.split(': ')[1] || m.title}</span>
+                                <i class="fas ${mLocked ? 'fa-lock' : 'fa-chevron-down'}"></i>
+                            </div>
+                            <div class="lesson-list" id="list-${m._id}" style="${mLocked ? 'display: none;' : (activeLessonId && m.lessons.some(l => l._id === activeLessonId) ? 'display: block;' : 'display: none;')}">
+                                ${m.lessons.map((l, lIdx) => {
+                                    // First lesson of the first unlocked module is unlocked.
+                                    let lLocked = mLocked;
+                                    if (!lLocked && lIdx > 0) {
+                                        const prevLesson = m.lessons[lIdx - 1];
+                                        if (!completedLessons.includes(prevLesson._id)) {
+                                            lLocked = true;
+                                        }
+                                    }
+
+                                    const isDone = completedLessons.includes(l._id);
+                                    return `
+                                        <div class="lesson-item ${lLocked ? 'locked' : ''} ${isDone ? 'completed' : ''} ${activeLessonId === l._id ? 'active' : ''}" 
+                                             onclick="${lLocked ? '' : `synthesizeLesson(${JSON.stringify(l).replace(/"/g, '&quot;')}, '${m._id}')`}">
+                                            <i class="fas ${isDone ? 'fa-check-circle' : (lLocked ? 'fa-lock' : 'fa-circle')}"></i>
+                                            ${l.title}
+                                        </div>
+                                    `;
+                                }).join('')}
+                                ${m.quiz && m.quiz.length > 0 ? `
+                                    <div class="quiz-item ${!completedLessons.includes(m.lessons[m.lessons.length - 1]._id) ? 'locked' : ''}" 
+                                         onclick="${!completedLessons.includes(m.lessons[m.lessons.length - 1]._id) ? '' : `startQuiz('${m._id}')`}">
+                                        <i class="fas fa-tasks"></i> Weekly Assignment
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `}).join('')}
+                </div>
+            `}).join('');
+        }
+
+        function toggleModule(id) {
+            const list = document.getElementById(`list-${id}`);
+            list.style.display = list.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function synthesizeLesson(lesson, moduleId) {
+            activeLessonId = lesson._id; renderSidebar();
+            const container = document.getElementById('lessonContent');
+            const mod = courseData.modules.find(m => m._id === moduleId);
+            
+            // Check for Special Submission View
+            if (lesson.aiGeneratedContent === 'SPECIAL_SUBMISSION_VIEW') {
+                renderSubmissionView();
+                return;
+            }
+
+            // Check if content is already cached in memory
+            if (lesson.aiGeneratedContent) {
+                console.log(`[Instant Load] Serving cached content for: ${lesson.title}`);
+                renderLesson(lesson, mod, lesson.aiGeneratedContent);
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="ai-loading">
+                    <div class="ai-pulse"><i class="fas fa-magic"></i></div>
+                    <h2 style="font-family: 'Space Grotesk';">Synthesizing ${lesson.title}...</h2>
+                    <p>Building your one-by-one mastery path.</p>
+                </div>
+            `;
+
+            try {
+                const res = await fetch('/api/lms/ai-explain', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${studentToken}` },
+                    body: JSON.stringify({ 
+                        topic: lesson.title, 
+                        content: lesson.content,
+                        moduleId: moduleId,
+                        lessonId: lesson._id
+                    })
+                });
+                const data = await res.json();
+                
+                // Save back to local object so it's instant next time
+                lesson.aiGeneratedContent = data.explanation;
+                
+                renderLesson(lesson, mod, data.explanation);
+            } catch (err) { container.innerHTML = '<h2>Synthesis Error</h2>'; }
+        }
+
+        function renderLesson(lesson, mod, explanation) {
+            const container = document.getElementById('lessonContent');
+            const completedLessons = courseData.progress?.completedLessons || [];
+            
+            // Find next navigation item
+            const allModules = courseData.modules;
+            const currentModIdx = allModules.findIndex(m => m._id === mod._id);
+            const currentLessonIdx = mod.lessons.findIndex(l => l._id === lesson._id);
+            let next = null;
+            if (currentLessonIdx < mod.lessons.length - 1) {
+                next = { lesson: mod.lessons[currentLessonIdx + 1], moduleId: mod._id };
+            } else if (mod.quiz?.length > 0) {
+                next = { type: 'quiz', moduleId: mod._id };
+            } else if (currentModIdx < allModules.length - 1) {
+                next = { lesson: allModules[currentModIdx + 1].lessons[0], moduleId: allModules[currentModIdx + 1]._id };
+            }
+
+            const isLessonDone = completedLessons.includes(lesson._id);
+
+            container.innerHTML = `
+                <div class="ai-view">
+                    <span style="color: var(--primary); font-weight: 800; font-size: 11px; text-transform: uppercase;">Week ${mod.week} • ${mod.title}</span>
+                    <h1 class="premium-title">${lesson.title}</h1>
+                    <div class="ai-body">${marked.parse(explanation)}</div>
+                    
+                    <div id="completionZone" style="margin-top: 40px; text-align: center;">
+                        ${isLessonDone ? 
+                            `<div style="color: #10b981; font-weight: 800; padding: 20px; background: #f0fdf4; border-radius: 20px;"><i class="fas fa-check-circle"></i> Lesson Mastered</div>` : 
+                            `<button class="btn-action" id="markDoneBtn" onclick="markDone('${lesson._id}')">Mark as Complete</button>`
+                        }
+                    </div>
+
+                    <div class="navigation-footer">
+                        <button class="btn-nav" onclick="window.history.back()"><i class="fas fa-chevron-left"></i> Previous</button>
+                        <button class="btn-nav next" id="nextNavBtn" 
+                                onclick="${next ? (next.type === 'quiz' ? `startQuiz('${next.moduleId}')` : `synthesizeLesson(${JSON.stringify(next.lesson).replace(/"/g, '&quot;')}, '${next.moduleId}')`) : ''}" 
+                                ${(!isLessonDone) ? 'style="display: none;"' : ''}>
+                            ${next ? (next.type === 'quiz' ? 'Unlock Weekly Assignment' : 'Next Lesson') : 'Finish Course'} <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            container.scrollTop = 0;
+            document.querySelector('main').scrollTop = 0;
+            
+            // Trigger syntax highlighting
+            hljs.highlightAll();
+        }
+
+        async function markDone(lessonId) {
+            const btn = document.getElementById('markDoneBtn');
+            btn.disabled = true;
+            btn.textContent = 'Recording Progress...';
+            
+            try {
+                await fetch(`/api/lms/lessons/${lessonId}/complete`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${studentToken}` }
+                });
+                
+                if (!courseData.progress.completedLessons) courseData.progress.completedLessons = [];
+                if (!courseData.progress.completedLessons.includes(lessonId)) {
+                    courseData.progress.completedLessons.push(lessonId);
+                }
+                
+                renderSidebar();
+                document.getElementById('completionZone').innerHTML = `<div style="color: #10b981; font-weight: 800; padding: 20px; background: #f0fdf4; border-radius: 20px;"><i class="fas fa-check-circle"></i> Lesson Mastered</div>`;
+                document.getElementById('nextNavBtn').style.display = 'flex';
+            } catch (err) { 
+                btn.disabled = false;
+                btn.textContent = 'Try Again';
+            }
+        }
+
+        async function startQuiz(mid) {
+            const module = courseData.modules.find(m => m._id === mid);
+            const container = document.getElementById('lessonContent');
+            container.innerHTML = `
+                <div class="quiz-container">
+                    <h1 class="premium-title">Week ${module.week} Assignment</h1>
+                    ${module.quiz.map((q, i) => `
+                        <div class="quiz-question" style="margin-bottom: 40px;">
+                            <h3 style="margin-bottom: 20px;">${i + 1}. ${escapeHTML(q.question)}</h3>
+                            ${q.options.map((opt, oi) => `<div class="quiz-option" onclick="sel(${i}, ${oi})" data-q="${i}" data-o="${oi}">${escapeHTML(opt)}</div>`).join('')}
+                        </div>
+                    `).join('')}
+                    <button class="btn-nav next" style="width: 100%;" onclick="submitQuiz('${mid}')">Submit Assessment</button>
+                </div>
+            `;
+            window.ans = new Array(module.quiz.length).fill(null);
+            document.querySelector('main').scrollTop = 0;
+        }
+
+        window.sel = (qi, oi) => {
+            window.ans[qi] = oi;
+            document.querySelectorAll(`[data-q="${qi}"]`).forEach(el => el.classList.remove('selected'));
+            document.querySelector(`[data-q="${qi}"][data-o="${oi}"]`).classList.add('selected');
+        };
+
+        async function submitQuiz(mid) {
+            if (window.ans.includes(null)) return alert('Answer all questions!');
+            const res = await fetch(`/api/lms/modules/${mid}/quiz`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${studentToken}` },
+                body: JSON.stringify({ answers: window.ans })
+            });
+            const result = await res.json();
+            if (result.passed) {
+                if (!courseData.progress.completedModules.includes(mid)) {
+                    courseData.progress.completedModules.push(mid);
+                }
+                renderSidebar();
+            }
+            const modal = document.getElementById('quizModal');
+            document.getElementById('modalTitle').textContent = result.passed ? 'Week Complete!' : 'Try Again';
+            document.getElementById('modalIcon').innerHTML = result.passed ? '🎉' : '❌';
+            document.getElementById('modalMessage').textContent = result.message;
+            document.getElementById('modalScore').textContent = `Score: ${result.score}%`;
+            modal.style.display = 'flex';
+        }
+
+        function renderSubmissionView() {
+            const container = document.getElementById('lessonContent');
+            container.innerHTML = `
+                <div class="ai-view" style="text-align: center; padding: 60px 20px;">
+                    <div style="font-size: 80px; margin-bottom: 30px;">🎉</div>
+                    <h1 class="premium-title">Congratulations!</h1>
+                    <p style="font-size: 18px; color: var(--text-muted); margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto;">
+                        You have successfully completed all modules of the SS WebTech Masterclass. 
+                        Your final step to becoming a Certified Full Stack Developer is to submit your Capstone Project.
+                    </p>
+                    
+                    <div style="background: #f8fafc; border: 1px solid var(--gray-border); padding: 40px; border-radius: 32px; max-width: 600px; margin: 0 auto; text-align: left;">
+                        <label style="display: block; margin-bottom: 15px; font-weight: 800; color: var(--dark); font-size: 14px; text-transform: uppercase;">
+                            Final Project Drive / Link
+                        </label>
+                        <input type="url" id="finalProjectLink" placeholder="Paste your Google Drive or GitHub link here..." 
+                               style="width: 100%; padding: 18px; border-radius: 16px; border: 1px solid var(--gray-border); margin-bottom: 25px; outline: none; font-size: 15px;">
+                        
+                        <button class="btn-action" onclick="submitFinalProject()" id="submitProjBtn" style="margin-top: 0;">
+                            Submit Final Project
+                        </button>
+                    </div>
+
+                    <p style="margin-top: 30px; color: var(--text-muted); font-size: 13px; font-weight: 500;">
+                        <i class="fas fa-info-circle"></i> After submission, our team will review your project. Your certificate will be issued upon approval.
+                    </p>
+                </div>
+            `;
+            container.scrollTop = 0;
+            document.querySelector('main').scrollTop = 0;
+        }
+
+        async function submitFinalProject() {
+            const link = document.getElementById('finalProjectLink').value;
+            if (!link) return alert('Please provide a valid project link!');
+            
+            const btn = document.getElementById('submitProjBtn');
+            btn.disabled = true;
+            btn.textContent = 'Submitting your journey...';
+
+            try {
+                const res = await fetch('/api/lms/project/submit', {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${studentToken}`
+                    },
+                    body: JSON.stringify({ link })
+                });
+
+                if (res.ok) {
+                    document.getElementById('lessonContent').innerHTML = `
+                        <div class="ai-view" style="text-align: center; padding: 100px 20px;">
+                            <div style="font-size: 80px; margin-bottom: 30px;">✅</div>
+                            <h1 class="premium-title">Submission Successful!</h1>
+                            <p style="font-size: 18px; color: var(--text-muted); margin-bottom: 40px;">
+                                Your final project has been submitted to the admin. <br>
+                                We will review your work and update your certification status soon.
+                            </p>
+                            <button class="btn-nav" style="max-width: 300px; margin: 0 auto;" onclick="window.location.href='/student/dashboard'">
+                                Back to Dashboard
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    alert('Submission failed. Please try again.');
+                    btn.disabled = false;
+                    btn.textContent = 'Submit Final Project';
+                }
+            } catch (err) {
+                alert('Connection error.');
+                btn.disabled = false;
+                btn.textContent = 'Submit Final Project';
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>
