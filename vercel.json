@@ -1,23 +1,21 @@
 {
   "version": 2,
-  "builds": [
+  "rewrites": [
     {
-      "src": "server/server.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "server/server.js"
+      "source": "/api/(.*)",
+      "destination": "/api/index.js"
     },
     {
-      "src": "/r/(.*)",
-      "dest": "server/server.js"
+      "source": "/r/(.*)",
+      "destination": "/api/index.js"
     },
     {
-      "src": "/(.*)",
-      "dest": "/public/$1"
+      "source": "/student/dashboard",
+      "destination": "/student-dashboard.html"
+    },
+    {
+      "source": "/student/course",
+      "destination": "/course-view.html"
     }
   ]
 }
