@@ -4,37 +4,21 @@
   "trailingSlash": false,
   "functions": {
     "api/server.js": {
-      "includeFiles": "*.png"
+      "includeFiles": "server/**"
     }
   },
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/server.js"
+      "src": "/api/(.*)",
+      "dest": "/api/server.js"
     },
     {
-      "source": "/r/(.*)",
-      "destination": "/api/server.js"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/(css|js|images|fonts)/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
+      "src": "/r/(.*)",
+      "dest": "/api/server.js"
     },
     {
-      "source": "/(.*).(jpg|jpeg|png|gif|svg|ico|css|js)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
+      "src": "/(.*)",
+      "dest": "/$1"
     }
   ]
 }
