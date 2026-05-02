@@ -486,7 +486,7 @@
                     </div>
                     <div class="hash-code" id="resHash">-</div>
                     <a href="#" id="explorerLink" target="_blank" class="explorer-link">
-                        <i class="fas fa-external-link-alt"></i> View on Polygon Scan
+                        <i class="fa-solid fa-cube"></i> View Digital Ledger Proof
                     </a>
                 </div>
 
@@ -577,7 +577,7 @@
                     document.getElementById('blockchainBadge').style.display = 'inline-flex';
                     document.getElementById('blockchainProof').style.display = 'block';
                     document.getElementById('resHash').textContent = data.blockchainHash;
-                    document.getElementById('explorerLink').href = `https://polygonscan.com/tx/${data.transactionId}`;
+                    document.getElementById('explorerLink').href = `/ledger.html?id=${data.certificateId}`;
                 }
             }
 

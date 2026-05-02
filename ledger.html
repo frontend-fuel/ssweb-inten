@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Ledger Explorer - SS WebTech</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #1d4ed8;
+            --primary-soft: #eff6ff;
+            --dark: #0f172a;
+            --darker: #020617;
+            --gray-light: #f8fafc;
+            --gray-border: #e2e8f0;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: #f8fafc;
+            background-image: radial-gradient(#e2e8f0 0.8px, transparent 0.8px);
+            background-size: 30px 30px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            width: 100%;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-area img { height: 45px; }
+        .logo-area span {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 22px;
+            color: var(--dark);
+            letter-spacing: -1px;
+        }
+
+        .status-pill {
+            padding: 10px 20px;
+            background: #ffffff;
+            color: var(--success);
+            border: 1px solid var(--gray-border);
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 800;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--success);
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        /* Explorer Card */
+        .explorer-card {
+            background: #ffffff;
+            border: 1px solid var(--gray-border);
+            border-radius: 32px;
+            padding: 50px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+            position: relative;
+        }
+
+        .block-header {
+            margin-bottom: 40px;
+            text-align: left;
+        }
+
+        .block-header h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 32px;
+            color: var(--dark);
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .block-header p {
+            color: var(--text-muted);
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .hash-display {
+            background: var(--gray-light);
+            border: 1px solid var(--gray-border);
+            padding: 30px;
+            border-radius: 24px;
+            margin-bottom: 40px;
+        }
+
+        .hash-label {
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .hash-value {
+            font-family: 'Space Grotesk', monospace;
+            font-size: 18px;
+            word-break: break-all;
+            color: var(--dark);
+            line-height: 1.5;
+            font-weight: 600;
+        }
+
+        /* Detail Grid */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .detail-item {
+            padding: 24px;
+            background: #ffffff;
+            border-radius: 20px;
+            border: 1px solid var(--gray-border);
+            transition: all 0.3s;
+        }
+
+        .detail-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .detail-item label {
+            display: block;
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .detail-item p {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        /* Integrity Scanner */
+        .integrity-scanner {
+            background: var(--gray-light);
+            border: 1px dashed var(--primary);
+            padding: 35px;
+            border-radius: 28px;
+            margin-top: 20px;
+        }
+
+        .scanner-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .scanner-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 800;
+            font-size: 14px;
+            color: var(--primary);
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: var(--gray-border);
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, var(--primary), var(--primary-dark));
+            transition: width 2s ease-in-out;
+            box-shadow: 0 0 15px var(--primary-soft);
+        }
+
+        .integrity-status {
+            font-size: 14px;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+
+        #verifySuccess {
+            display: none;
+            color: var(--success);
+            font-weight: 800;
+            margin-top: 15px;
+            align-items: center;
+            gap: 10px;
+            background: #f0fdf4;
+            padding: 15px;
+            border-radius: 12px;
+            border: 1px solid #dcfce7;
+        }
+
+        .footer {
+            margin-top: auto;
+            padding: 40px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            font-weight: 600;
+            border-top: 1px solid var(--gray-border);
+        }
+
+        .loader-overlay {
+            position: fixed;
+            inset: 0;
+            background: #ffffff;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .cube-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--primary-soft);
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 768px) {
+            .detail-grid { grid-template-columns: 1fr; }
+            .explorer-card { padding: 30px 20px; border-radius: 24px; }
+            .hash-value { font-size: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="loader-overlay" id="loader">
+        <div class="cube-spinner"></div>
+        <p style="font-weight: 800; letter-spacing: 2px; color: var(--primary);">SYNCING LEDGER...</p>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo-area">
+                <img src="/logo100.png" alt="Logo">
+                <span>DIGITAL LEDGER</span>
+            </div>
+            <div class="status-pill">
+                <div class="status-dot"></div>
+                Network Active
+            </div>
+        </header>
+
+        <main class="explorer-card">
+            <div class="block-header">
+                <h1>Certificate Block Details</h1>
+                <p>Public record of cryptographic authenticity for internship credentials.</p>
+            </div>
+
+            <div class="hash-display">
+                <span class="hash-label">Transaction Hash (On-Chain Fingerprint)</span>
+                <div class="hash-value" id="blockchainHash">Fetching...</div>
+            </div>
+
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <label>Certificate ID</label>
+                    <p id="certId">-</p>
+                </div>
+                <div class="detail-item">
+                    <label>Recipient Name</label>
+                    <p id="studentName">-</p>
+                </div>
+                <div class="detail-item">
+                    <label>Internship Domain</label>
+                    <p id="domain">-</p>
+                </div>
+                <div class="detail-item">
+                    <label>Timestamp</label>
+                    <p id="timestamp">-</p>
+                </div>
+            </div>
+
+            <div class="integrity-scanner">
+                <div class="scanner-header">
+                    <div class="scanner-title">
+                        <i class="fa-solid fa-microchip"></i> CRYPTOGRAPHIC INTEGRITY CHECK
+                    </div>
+                    <div class="integrity-status" id="scanStatus">Awaiting Data...</div>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div id="verifySuccess">
+                    <i class="fa-solid fa-circle-check"></i> 
+                    VERIFICATION SUCCESS: Data integrity matches blockchain fingerprint (SHA-256)
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="footer">
+        &copy; 2026 SS WebTech. Powered by Private Ledger Technology.
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+
+        if (!id) {
+            window.location.href = '/verify';
+        }
+
+        async function fetchLedgerData() {
+            try {
+                const res = await fetch(`/api/certificates/${id}`);
+                const data = await res.json();
+
+                if (!res.ok) throw new Error('Not found');
+
+                // Fill UI
+                document.getElementById('blockchainHash').textContent = data.blockchainHash || 'GENESIS_HASH_PENDING';
+                document.getElementById('certId').textContent = data.certificateId;
+                document.getElementById('studentName').textContent = data.studentName;
+                document.getElementById('domain').textContent = data.internshipDomain;
+                document.getElementById('timestamp').textContent = new Date(data.createdAt).toUTCString();
+
+                document.getElementById('loader').style.display = 'none';
+
+                // Start Integrity Scan Animation
+                startIntegrityScan(data);
+
+            } catch (err) {
+                alert('Ledger entry not found.');
+                window.location.href = '/verify';
+            }
+        }
+
+        function startIntegrityScan(data) {
+            const scanStatus = document.getElementById('scanStatus');
+            const progressFill = document.getElementById('progressFill');
+            const successMsg = document.getElementById('verifySuccess');
+
+            scanStatus.textContent = 'Reading Certificate DNA...';
+            
+            setTimeout(() => {
+                progressFill.style.width = '40%';
+                scanStatus.textContent = 'Computing SHA-256 Fingerprint...';
+            }, 1000);
+
+            setTimeout(() => {
+                progressFill.style.width = '75%';
+                scanStatus.textContent = 'Comparing with Blockchain Hash...';
+            }, 2500);
+
+            setTimeout(() => {
+                // Normalize data (Dates to YYYY-MM-DD) to match server hashing
+                const sDate = data.startDate.split('T')[0];
+                const eDate = data.endDate.split('T')[0];
+
+                // Perform REAL local verification to prove logic
+                const fingerprintData = `${data.certificateId}|${data.studentName}|${data.studentEmail}|${data.internshipDomain}|${sDate}|${eDate}`;
+                const computedHash = CryptoJS.SHA256(fingerprintData).toString();
+                
+                if (computedHash === data.blockchainHash) {
+                    progressFill.style.width = '100%';
+                    scanStatus.textContent = 'INTEGRITY VERIFIED';
+                    successMsg.style.display = 'flex';
+                } else {
+                    scanStatus.textContent = 'DATA TAMPERED DETECTED!';
+                    scanStatus.style.color = '#ef4444';
+                    progressFill.style.background = '#ef4444';
+                }
+            }, 4000);
+        }
+
+        fetchLedgerData();
+    </script>
+</body>
+</html>

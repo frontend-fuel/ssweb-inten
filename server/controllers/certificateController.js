@@ -65,8 +65,11 @@ const createCertificate = async (req, res) => {
     });
 
     // ✅ Step 2: Generate Blockchain Fingerprint (SHA-256 Hash)
-    // This creates a "Digital DNA" for the certificate that cannot be forged.
-    const fingerprintData = `${certificateId}|${studentName}|${studentEmail}|${internshipDomain}|${startDate}|${endDate}`;
+    // Normalize data (Dates to YYYY-MM-DD) to ensure consistent hashing
+    const sDate = new Date(startDate).toISOString().split('T')[0];
+    const eDate = new Date(endDate).toISOString().split('T')[0];
+    
+    const fingerprintData = `${certificateId}|${studentName}|${studentEmail}|${internshipDomain}|${sDate}|${eDate}`;
     const blockchainHash = crypto.createHash('sha256').update(fingerprintData).digest('hex');
     
     // ✅ Step 3: Self-hosted redirect

@@ -63,6 +63,7 @@ app.get('/', (req, res) => res.sendFile(path.join(__dirname, '../index.html')));
 app.get('/login', (req, res) => res.redirect('/'));
 app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, '../dashboard.html')));
 app.get('/verify', (req, res) => res.sendFile(path.join(__dirname, '../verify.html')));
+app.get('/ledger', (req, res) => res.sendFile(path.join(__dirname, '../ledger.html')));
 
 // ✅ Self-Hosted Certificate Redirect — QR codes point here
 const handleRedirect = (req, res) => {
