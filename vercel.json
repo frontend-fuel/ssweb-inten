@@ -19,8 +19,28 @@
       "destination": "/dashboard.html"
     },
     {
+      "source": "/ledger",
+      "destination": "/ledger.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/verify",
+      "destination": "/verify.html"
+    },
+    {
+      "source": "/playground",
+      "destination": "/playground.html"
+    },
+    {
       "source": "/student/dashboard",
       "destination": "/student/dashboard.html"
+    },
+    {
+      "source": "/student/course",
+      "destination": "/student/course.html"
     }
   ]
 }
