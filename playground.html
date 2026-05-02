@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Playground - SS WebTech</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --dark: #0f172a;
+            --darker: #020617;
+            --bg-editor: #1e1e2e;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--darker);
+            color: var(--text-main);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Navbar */
+        nav {
+            height: 60px;
+            background: var(--dark);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 25px;
+            z-index: 100;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .nav-logo img { height: 32px; }
+
+        .actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-muted); }
+        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+        /* Main Layout */
+        .playground-main {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Editor Section */
+        .editor-container {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-editor);
+            border-right: 2px solid var(--border);
+        }
+
+        .tabs {
+            background: #11111b;
+            display: flex;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab {
+            padding: 12px 25px;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 700;
+            border-right: 1px solid var(--border);
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab.active {
+            background: var(--bg-editor);
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .tab i { font-size: 14px; }
+        .tab-html i { color: #e34c26; }
+        .tab-css i { color: #264de4; }
+        .tab-js i { color: #f7df1e; }
+
+        .editor-wrapper {
+            flex: 1;
+            position: relative;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            color: #d1d1e9;
+            border: none;
+            outline: none;
+            padding: 20px;
+            font-family: 'Fira Code', monospace;
+            font-size: 15px;
+            line-height: 1.6;
+            resize: none;
+            display: none;
+        }
+
+        textarea.active { display: block; }
+
+        /* Preview Section */
+        .preview-container {
+            flex: 1;
+            background: #fff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .preview-header {
+            height: 40px;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            gap: 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .dot { width: 10px; height: 10px; border-radius: 50%; }
+        .dot-r { background: #ff5f56; }
+        .dot-y { background: #ffbd2e; }
+        .dot-g { background: #27c93f; }
+
+        .preview-url {
+            background: #fff;
+            padding: 4px 15px;
+            border-radius: 20px;
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 600;
+            border: 1px solid #e2e8f0;
+            flex: 1;
+            margin: 0 15px;
+        }
+
+        iframe {
+            flex: 1;
+            border: none;
+            width: 100%;
+            background: white;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 900px) {
+            .playground-main { flex-direction: column; }
+            .editor-container, .preview-container { width: 100%; height: 50%; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="/student/course" class="nav-logo">
+            <img src="/logo100.png" alt="Logo">
+            <span>CODE PLAYGROUND</span>
+        </a>
+        <div class="actions">
+            <button class="btn btn-outline" onclick="resetCode()">
+                <i class="fas fa-undo"></i> Reset
+            </button>
+            <button class="btn btn-outline" onclick="downloadCode()">
+                <i class="fas fa-download"></i> Save File
+            </button>
+            <button class="btn btn-primary" onclick="runCode()">
+                <i class="fas fa-play"></i> Run Code
+            </button>
+        </div>
+    </nav>
+
+    <main class="playground-main">
+        <section class="editor-container">
+            <div class="tabs">
+                <div class="tab active tab-html" data-target="htmlEditor" onclick="switchTab(this)">
+                    <i class="fab fa-html5"></i> index.html
+                </div>
+                <div class="tab tab-css" data-target="cssEditor" onclick="switchTab(this)">
+                    <i class="fab fa-css3-alt"></i> style.css
+                </div>
+                <div class="tab tab-js" data-target="jsEditor" onclick="switchTab(this)">
+                    <i class="fab fa-js"></i> script.js
+                </div>
+            </div>
+            <div class="editor-wrapper">
+                <textarea id="htmlEditor" class="active" spellcheck="false"><!-- Write HTML here -->
+<div class="card">
+    <h1>Hello SS WebTech!</h1>
+    <p>Welcome to your Interactive Playground.</p>
+    <button id="btn">Click Me</button>
+</div></textarea>
+                <textarea id="cssEditor" spellcheck="false">/* Write CSS here */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f0f4f8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.card {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+button {
+    background: #3b82f6;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 20px;
+}</textarea>
+                <textarea id="jsEditor" spellcheck="false">// Write JS here
+const btn = document.getElementById('btn');
+
+btn.addEventListener('click', () => {
+    alert('Code is working perfectly!');
+    btn.style.background = '#10b981';
+    btn.textContent = 'Awesome!';
+});</textarea>
+            </div>
+        </section>
+
+        <section class="preview-container">
+            <div class="preview-header">
+                <div class="dot dot-r"></div>
+                <div class="dot dot-y"></div>
+                <div class="dot dot-g"></div>
+                <div class="preview-url">live-preview.local/sandbox</div>
+            </div>
+            <iframe id="previewFrame"></iframe>
+        </section>
+    </main>
+
+    <script>
+        const htmlEditor = document.getElementById('htmlEditor');
+        const cssEditor = document.getElementById('cssEditor');
+        const jsEditor = document.getElementById('jsEditor');
+        const previewFrame = document.getElementById('previewFrame');
+
+        function runCode() {
+            const html = htmlEditor.value;
+            const css = `<style>${cssEditor.value}</style>`;
+            const js = `<script>${jsEditor.value}<\/script>`;
+            
+            const fullCode = `
+                ${html}
+                ${css}
+                ${js}
+            `;
+
+            const blob = new Blob([fullCode], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            previewFrame.src = url;
+        }
+
+        function switchTab(el) {
+            const target = el.getAttribute('data-target');
+            
+            // UI
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            el.classList.add('active');
+
+            // Editor
+            document.querySelectorAll('textarea').forEach(t => t.classList.remove('active'));
+            document.getElementById(target).classList.add('active');
+        }
+
+        function resetCode() {
+            if(confirm('Are you sure you want to reset your code?')) {
+                location.reload();
+            }
+        }
+
+        function downloadCode() {
+            const fullCode = `${htmlEditor.value}\n<style>${cssEditor.value}</style>\n<script>${jsEditor.value}<\/script>`;
+            const blob = new Blob([fullCode], { type: 'text/html' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'my-sswebtech-project.html';
+            a.click();
+        }
+
+        // Live Auto-Run (Optional, can be toggled)
+        let timer;
+        [htmlEditor, cssEditor, jsEditor].forEach(ed => {
+            ed.addEventListener('input', () => {
+                clearTimeout(timer);
+                timer = setTimeout(runCode, 800);
+            });
+        });
+
+        // Initial Run
+        runCode();
+    </script>
+</body>
+</html>
