@@ -45,7 +45,7 @@ Requirements:
             });
 
             const data = await response.json();
-            
+
             if (data.error && data.error.type === 'rate_limit_exceeded') {
                 console.log(`    ⏳ Rate limit hit. Waiting 30 seconds...`);
                 await new Promise(r => setTimeout(r, 30000));
@@ -57,9 +57,9 @@ Requirements:
                 console.error(`  ❌ API Error: ${data.error.message}`);
                 return null;
             }
-            
+
             let content = data.choices[0].message.content;
-            
+
             const jsonMatch = content.match(/\[\s*\{[\s\S]*\}\s*\]/);
             if (jsonMatch) {
                 content = jsonMatch[0];
@@ -110,7 +110,7 @@ async function run() {
             }
 
             // Delay for rate limits
-            await new Promise(r => setTimeout(r, 10000));
+            await new Promise(r => setTimeout(r, 5000));
         }
 
         console.log('\n🚀 ALL QUIZZES GENERATED SUCCESSFULLY!');
