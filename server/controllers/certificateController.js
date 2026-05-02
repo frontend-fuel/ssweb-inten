@@ -168,41 +168,41 @@ const generatePDF = async (req, res) => {
     // 4. Logo Section
     const logoPath = path.join(__dirname, '../../logo100.png');
     if (fs.existsSync(logoPath)) {
-      const logoWidth = isLandscape ? 150 : 250;
-      doc.image(logoPath, (doc.page.width - logoWidth) / 2, isLandscape ? 35 : 80, { width: logoWidth });
+      const logoWidth = isLandscape ? 240 : 250;
+      doc.image(logoPath, (doc.page.width - logoWidth) / 2, isLandscape ? 45 : 80, { width: logoWidth });
     }
 
     // 5. Text Content Section
-    const titleY = isLandscape ? 105 : 200;
-    doc.font('Helvetica-Bold').fontSize(isLandscape ? 28 : 24).fillColor('#1e3a8a').text('CERTIFICATE OF INTERNSHIP', 0, titleY, { align: 'center', characterSpacing: 2 });
-    doc.font('Helvetica').fontSize(11).fillColor('#64748b').text('THIS IS PROUDLY PRESENTED TO', 0, titleY + 35, { align: 'center', characterSpacing: 3 });
+    const titleY = isLandscape ? 140 : 200;
+    doc.font('Helvetica-Bold').fontSize(isLandscape ? 32 : 24).fillColor('#1e3a8a').text('CERTIFICATE OF INTERNSHIP', 0, titleY, { align: 'center', characterSpacing: 2 });
+    doc.font('Helvetica').fontSize(isLandscape ? 12 : 12).fillColor('#64748b').text('THIS IS PROUDLY PRESENTED TO', 0, titleY + (isLandscape ? 40 : 55), { align: 'center', characterSpacing: 3 });
     
-    const nameY = isLandscape ? 165 : 285;
+    const nameY = isLandscape ? 200 : 285;
     const nameText = certificate.studentName.toUpperCase();
-    doc.font('Helvetica-Bold').fontSize(isLandscape ? 36 : 28.5).fillColor('#0f172a').text(nameText, 0, nameY, { align: 'center' });
+    doc.font('Helvetica-Bold').fontSize(isLandscape ? 48 : 28.5).fillColor('#0f172a').text(nameText, 0, nameY, { align: 'center' });
 
     const textWidth = doc.widthOfString(nameText);
     const startX = (doc.page.width - textWidth) / 2;
-    doc.moveTo(startX - 20, nameY + (isLandscape ? 40 : 38)).lineTo(startX + textWidth + 20, nameY + (isLandscape ? 40 : 38)).strokeColor('#d4af37').lineWidth(3.5).stroke();
+    doc.moveTo(startX - 20, nameY + (isLandscape ? 52 : 38)).lineTo(startX + textWidth + 20, nameY + (isLandscape ? 52 : 38)).strokeColor('#d4af37').lineWidth(4).stroke();
 
-    const bodyY = isLandscape ? 230 : 365;
-    doc.font('Helvetica').fontSize(11).fillColor('#334155').text(`has successfully completed an Internship as a`, 0, bodyY, { align: 'center' });
-    doc.font('Helvetica-Bold').fontSize(isLandscape ? 15 : 13.5).fillColor('#1e3a8a').text(`${certificate.internshipDomain.toUpperCase()} at SS WebTech.`, 0, bodyY + 20, { align: 'center' });
+    const bodyY = isLandscape ? 280 : 365;
+    doc.font('Helvetica').fontSize(isLandscape ? 12 : 12).fillColor('#334155').text(`has successfully completed an Internship as a`, 0, bodyY, { align: 'center' });
+    doc.font('Helvetica-Bold').fontSize(isLandscape ? 18 : 13.5).fillColor('#1e3a8a').text(`${certificate.internshipDomain.toUpperCase()} at SS WebTech.`, 0, bodyY + 22, { align: 'center' });
 
     const start = new Date(certificate.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
     const end = new Date(certificate.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
-    doc.font('Helvetica-Bold').fontSize(11).fillColor('#475569').text(`Duration: ${start} to ${end}`, 0, bodyY + 45, { align: 'center' });
+    doc.font('Helvetica-Bold').fontSize(11).fillColor('#475569').text(`Duration: ${start} to ${end}`, 0, bodyY + (isLandscape ? 48 : 50), { align: 'center' });
 
     const summary = certificate.description || "During the internship period, the student was involved in designing, developing, and maintaining web applications. Working sincerely with the team, demonstrating good technical skills, dedication, and enthusiasm towards learning.";
-    doc.font('Helvetica').fontSize(isLandscape ? 11 : 11).fillColor('#475569').text(summary, 80, bodyY + 75, { align: 'center', lineGap: 3, width: doc.page.width - 160 });
+    doc.font('Helvetica').fontSize(isLandscape ? 10 : 11).fillColor('#475569').text(summary, isLandscape ? 80 : 80, bodyY + (isLandscape ? 75 : 85), { align: 'center', lineGap: isLandscape ? 3 : 4, width: doc.page.width - (isLandscape ? 160 : 160) });
 
-    doc.font('Helvetica-Bold').fontSize(11).fillColor('#0f172a').text(`Performance during the internship was found to be satisfactory.`, 0, doc.y + (isLandscape ? 12 : 25), { align: 'center' });
-
+    doc.font('Helvetica-Bold').fontSize(11).fillColor('#0f172a').text(`Performance during the internship was found to be satisfactory.`, 0, doc.y + (isLandscape ? 8 : 25), { align: 'center' });
+    
     const issueDate = new Date(certificate.issueDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
-    doc.font('Helvetica-Bold').fontSize(10).fillColor('#0f172a').text(`DATE: ${issueDate.toUpperCase()}`, 0, doc.y + 15, { align: 'center' });
+    doc.font('Helvetica-Bold').fontSize(10).fillColor('#0f172a').text(`DATE: ${issueDate.toUpperCase()}`, 0, doc.y + (isLandscape ? 5 : 15), { align: 'center' });
 
     // 6. Footer Layout Constants (Define early for use in QR positioning)
-    const footerY = doc.page.height - (isLandscape ? 110 : 150);
+    const footerY = doc.page.height - (isLandscape ? 140 : 170);
     const paddingX = isLandscape ? 100 : 70;
 
     // QR Code Section
@@ -210,13 +210,13 @@ const generatePDF = async (req, res) => {
     const qrCodeImage = await QRCode.toDataURL(verificationUrl, { margin: 1 });
     const qrBuffer = Buffer.from(qrCodeImage.split(',')[1], 'base64');
     
-    const qrWidth = isLandscape ? 55 : 80;
-    const qrY = isLandscape ? footerY : (doc.y + 15);
+    const qrWidth = isLandscape ? 65 : 80;
+    const qrY = isLandscape ? footerY - 5 : (doc.y + 15);
     const qrX = isLandscape ? (doc.page.width - qrWidth) / 2 : (doc.page.width - qrWidth) / 2;
     doc.image(qrBuffer, qrX, qrY, { width: qrWidth });
     
     // Position ID text below the QR code
-    doc.font('Courier').fontSize(isLandscape ? 7 : 8).fillColor('#64748b').text(`ID: ${certificate.certificateId}`, 0, qrY + qrWidth + 4, { align: 'center', width: doc.page.width });
+    doc.font('Courier').fontSize(isLandscape ? 7 : 8).fillColor('#64748b').text(`ID: ${certificate.certificateId}`, 0, qrY + qrWidth + (isLandscape ? 0 : 0), { align: 'center', width: doc.page.width });
 
     // 6. Footer Section
     // (Constants already defined above)
@@ -226,26 +226,24 @@ const generatePDF = async (req, res) => {
       doc.image(msmePath, paddingX, isLandscape ? footerY : footerY, { height: isLandscape ? 65 : 75 });
     }
 
-    // (Moved to Signature Area)
-
-    const signatureWidth = 160;
+    // Signature Section
+    const signatureWidth = 150;
     const signatureX = doc.page.width - paddingX - signatureWidth;
-    const signY = footerY + 45;
+    const signY = footerY + (isLandscape ? 60 : 60); // Lower the line slightly
     
     // Digital Signature Image
     const signaturePath = path.join(__dirname, '../../signature.png');
     if (fs.existsSync(signaturePath)) {
-      doc.image(signaturePath, signatureX + 10, signY - 35, { width: 140 });
+      doc.image(signaturePath, signatureX + 5, signY - 30, { width: 140 });
     }
     
-    doc.moveTo(signatureX + 10, signY + 15).lineTo(signatureX + signatureWidth - 10, signY + 15).strokeColor('#94a3b8').lineWidth(1).stroke();
-    doc.font('Helvetica-Bold').fontSize(9).fillColor('#64748b').text('FOUNDER & CEO', signatureX, signY + 22, { width: signatureWidth, align: 'center' });
+    doc.moveTo(signatureX, signY).lineTo(signatureX + signatureWidth, signY).strokeColor('#1e3a8a').lineWidth(1).stroke();
+    doc.font('Helvetica-Bold').fontSize(10).fillColor('#1e3a8a').text('FOUNDER & CEO', signatureX, signY + (isLandscape ? 5 : 5), { width: signatureWidth, align: 'center' });
 
-    // Official Stamp Image (Centered slightly above the signature line)
-    // Official Stamp Image (In place of Signature)
+    // Official Stamp Image
     const stampPath = path.join(__dirname, '../../sswebtechstamp.png');
     if (fs.existsSync(stampPath)) {
-      doc.image(stampPath, signatureX + 35, signY - 65, { width: 90 });
+      doc.image(stampPath, signatureX + 30, signY - 80, { width: 90 });
     }
 
     doc.end();
