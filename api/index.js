@@ -44,11 +44,18 @@ app.use(async (req, res, next) => {
     }
 });
 
-// Mount routes
+// Mount routes (Both with and without /api prefix for Vercel compatibility)
 app.use('/api/admin', adminRoutes);
+app.use('/admin', adminRoutes);
+
 app.use('/api/certificates', certificateRoutes);
+app.use('/certificates', certificateRoutes);
+
 app.use('/api/students', studentRoutes);
+app.use('/students', studentRoutes);
+
 app.use('/api/lms', lmsRoutes);
+app.use('/lms', lmsRoutes);
 
 // Frontend routes
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, '../index.html')));
