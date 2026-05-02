@@ -758,7 +758,22 @@
                         <td>${c.internshipDomain}</td>
                         <td>${new Date(c.issueDate).toLocaleDateString()}</td>
                         <td><span style="padding: 5px 12px; border-radius: 50px; font-size: 11px; background: #f0fdf4; color: #10b981; border: 1px solid #dcfce7;">ACTIVE</span></td>
-                        <td><a href="/api/certificates/${c.certificateId}/pdf" class="btn-primary" style="padding: 8px 15px; font-size: 12px;"><i class="fas fa-download"></i> PDF</a></td>
+                        <td>
+                            <div style="display: flex; gap: 8px;">
+                                <a href="/api/certificates/${c.certificateId}/pdf?preview=true&layout=portrait" target="_blank" class="btn-icon" title="Portrait Preview" style="color: #10b981; background: #f0fdf4; width: 35px; height: 35px; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid #dcfce7; text-decoration: none;">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="/api/certificates/${c.certificateId}/pdf?preview=true&layout=landscape" target="_blank" class="btn-icon" title="Landscape Preview" style="color: #10b981; background: #f0fdf4; width: 35px; height: 35px; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid #dcfce7; text-decoration: none;">
+                                    <i class="fas fa-window-maximize"></i>
+                                </a>
+                                <a href="/api/certificates/${c.certificateId}/pdf?layout=portrait" target="_blank" class="btn-icon" title="Portrait Download" style="color: #3b82f6; background: #eff6ff; width: 35px; height: 35px; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid #e0f2fe; text-decoration: none;">
+                                    <i class="fas fa-file-invoice"></i>
+                                </a>
+                                <a href="/api/certificates/${c.certificateId}/pdf?layout=landscape" target="_blank" class="btn-icon" title="Landscape Download" style="color: #8b5cf6; background: #f3f0ff; width: 35px; height: 35px; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid #ede9fe; text-decoration: none;">
+                                    <i class="fas fa-file-alt"></i>
+                                </a>
+                            </div>
+                        </td>
                     </tr>
                 `).join('');
             } catch (err) { tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 50px; color: var(--error);">Error loading certificates.</td></tr>'; }
