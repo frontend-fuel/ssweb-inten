@@ -34,7 +34,7 @@ const getCertificateById = async (req, res) => {
 
 // @desc    Create a certificate
 const createCertificate = async (req, res) => {
-  const { studentName, studentEmail, internshipDomain, startDate, endDate, duration, companyName, description } = req.body;
+  const { studentName, studentEmail, internshipDomain, startDate, endDate, duration, companyName, description, issueDate } = req.body;
 
   try {
     const currentYear = new Date().getFullYear();
@@ -61,15 +61,17 @@ const createCertificate = async (req, res) => {
       endDate,
       duration,
       companyName: companyName || 'SS WebTech',
-      description
+      description,
+      issueDate: issueDate || Date.now()
     });
 
     // ✅ Step 2: Generate Blockchain Fingerprint (SHA-256 Hash)
     // Normalize data (Dates to YYYY-MM-DD) to ensure consistent hashing
     const sDate = new Date(startDate).toISOString().split('T')[0];
     const eDate = new Date(endDate).toISOString().split('T')[0];
+    const iDate = new Date(certificate.issueDate).toISOString().split('T')[0];
     
-    const fingerprintData = `${certificateId}|${studentName}|${studentEmail}|${internshipDomain}|${sDate}|${eDate}`;
+    const fingerprintData = `${certificateId}|${studentName}|${studentEmail}|${internshipDomain}|${sDate}|${eDate}|${iDate}`;
     const blockchainHash = crypto.createHash('sha256').update(fingerprintData).digest('hex');
     
     // ✅ Step 3: Self-hosted redirect
@@ -109,6 +111,7 @@ const updateCertificate = async (req, res) => {
       certificate.duration = req.body.duration || certificate.duration;
       certificate.status = req.body.status || certificate.status;
       certificate.description = req.body.description || certificate.description;
+      certificate.issueDate = req.body.issueDate || certificate.issueDate;
 
       const updatedCertificate = await certificate.save();
       res.json(updatedCertificate);

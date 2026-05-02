@@ -144,9 +144,10 @@ window.openEditModal = async (id) => {
         document.getElementById('studentName').value = cert.studentName;
         document.getElementById('studentEmail').value = cert.studentEmail || '';
         document.getElementById('domain').value = cert.internshipDomain;
-        document.getElementById('duration').value = cert.duration;
+        document.getElementById('duration').value = cert.duration ? cert.duration.split(' ')[0] : '';
         document.getElementById('startDate').value = cert.startDate.split('T')[0];
         document.getElementById('endDate').value = cert.endDate.split('T')[0];
+        document.getElementById('issueDate').value = cert.issueDate ? cert.issueDate.split('T')[0] : '';
         document.getElementById('status').value = cert.status;
         document.getElementById('description').value = cert.description || '';
         
@@ -165,13 +166,17 @@ certForm.onsubmit = async (e) => {
     saveBtn.innerHTML = 'Saving...';
 
     const id = document.getElementById('editCertId').value;
+    const durationValue = document.getElementById('duration').value;
+    const durationFormatted = durationValue == 1 ? "1 Month" : `${durationValue} Months`;
+
     const data = {
         studentName: document.getElementById('studentName').value,
         studentEmail: document.getElementById('studentEmail').value,
         internshipDomain: document.getElementById('domain').value,
-        duration: document.getElementById('duration').value,
+        duration: durationFormatted,
         startDate: document.getElementById('startDate').value,
         endDate: document.getElementById('endDate').value,
+        issueDate: document.getElementById('issueDate').value || null,
         status: document.getElementById('status').value,
         description: document.getElementById('description').value
     };

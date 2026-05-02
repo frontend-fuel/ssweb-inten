@@ -420,9 +420,10 @@
                 // Normalize data (Dates to YYYY-MM-DD) to match server hashing
                 const sDate = data.startDate.split('T')[0];
                 const eDate = data.endDate.split('T')[0];
+                const iDate = data.issueDate.split('T')[0];
 
                 // Perform REAL local verification to prove logic
-                const fingerprintData = `${data.certificateId}|${data.studentName}|${data.studentEmail}|${data.internshipDomain}|${sDate}|${eDate}`;
+                const fingerprintData = `${data.certificateId}|${data.studentName}|${data.studentEmail}|${data.internshipDomain}|${sDate}|${eDate}|${iDate}`;
                 const computedHash = CryptoJS.SHA256(fingerprintData).toString();
                 
                 if (computedHash === data.blockchainHash) {

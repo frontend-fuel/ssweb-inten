@@ -851,8 +851,8 @@
                         <input type="text" id="domain" class="form-control" placeholder="e.g. Web Development" required>
                     </div>
                     <div class="form-group">
-                        <label>Internship Duration</label>
-                        <input type="text" id="duration" class="form-control" placeholder="e.g. 3 Months" required>
+                        <label>Duration (in Months)</label>
+                        <input type="number" id="duration" class="form-control" placeholder="e.g. 3" required min="1">
                     </div>
                     <div class="form-group">
                         <label>Start Date</label>
@@ -861,6 +861,11 @@
                     <div class="form-group">
                         <label>End Date</label>
                         <input type="date" id="endDate" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Issue Date</label>
+                        <input type="date" id="issueDate" class="form-control">
+                        <small style="color: var(--text-muted); font-size: 10px;">Leave blank for today's date</small>
                     </div>
                     <div class="form-group full-width" id="statusGroup" style="display: none;">
                         <label>Credential Status</label>
