@@ -78,22 +78,22 @@ function renderTable(certs) {
             <td>
                 <div class="action-btns">
                     <a href="${API_URL}/certificates/${cert.certificateId}/pdf?preview=true&layout=portrait" target="_blank" class="btn-icon" title="Portrait Preview" style="color: var(--success); background: #f0fdf4;">
-                        <i class="fas fa-eye"></i>
+                        <i class="fa-solid fa-eye"></i>
                     </a>
                     <a href="${API_URL}/certificates/${cert.certificateId}/pdf?preview=true&layout=landscape" target="_blank" class="btn-icon" title="Landscape Preview" style="color: #10b981; background: #ecfdf5;">
-                        <i class="fas fa-window-maximize"></i>
+                        <i class="fa-solid fa-window-maximize"></i>
                     </a>
                     <a href="${API_URL}/certificates/${cert.certificateId}/pdf?layout=portrait" target="_blank" class="btn-icon" title="Portrait PDF" style="color: var(--primary); background: #eff6ff;">
-                        <i class="fas fa-file-invoice"></i>
+                        <i class="fa-solid fa-file-invoice"></i>
                     </a>
                     <a href="${API_URL}/certificates/${cert.certificateId}/pdf?layout=landscape" target="_blank" class="btn-icon" title="Landscape PDF" style="color: #8b5cf6; background: #f3f0ff;">
-                        <i class="fas fa-file-alt"></i>
+                        <i class="fa-solid fa-file-alt"></i>
                     </a>
                     <button onclick="openEditModal('${cert.certificateId}')" class="btn-icon" title="Edit" style="color: var(--warning); background: #fffbeb;">
-                        <i class="fas fa-edit"></i>
+                        <i class="fa-solid fa-edit"></i>
                     </button>
                     <button onclick="deleteCert('${cert.certificateId}')" class="btn-icon" title="Delete" style="color: var(--error); background: #fef2f2;">
-                        <i class="fas fa-trash-alt"></i>
+                        <i class="fa-solid fa-trash-can"></i>
                     </button>
                 </div>
             </td>
@@ -316,7 +316,7 @@ function renderStudentsTable(students) {
                         Reset PWD
                     </button>
                     <button onclick="deleteStudent('${student._id}', '${student.name}')" class="btn-icon" style="color: var(--error); border-color: var(--error); background: #fef2f2;" title="Delete Student">
-                        <i class="fas fa-trash-alt"></i>
+                        <i class="fa-solid fa-trash-can"></i>
                     </button>
                 </div>
             </td>
