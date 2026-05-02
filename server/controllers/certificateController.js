@@ -168,7 +168,7 @@ const generatePDF = async (req, res) => {
     // 4. Logo Section
     const logoPath = path.join(__dirname, '../../logo100.png');
     if (fs.existsSync(logoPath)) {
-      const logoWidth = isLandscape ? 150 : 200;
+      const logoWidth = isLandscape ? 150 : 250;
       doc.image(logoPath, (doc.page.width - logoWidth) / 2, isLandscape ? 35 : 80, { width: logoWidth });
     }
 
