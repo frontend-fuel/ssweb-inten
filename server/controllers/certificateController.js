@@ -163,7 +163,7 @@ const generatePDF = async (req, res) => {
     doc.path(`M ${doc.page.width - margin} ${doc.page.height - margin} L ${doc.page.width - margin - accentSize} ${doc.page.height - margin} L ${doc.page.width - margin} ${doc.page.height - margin - accentSize} Z`).fill('#1e3a8a');
 
     // 4. Logo Section
-    const logoPath = path.join(__dirname, '../../public/logo100.png');
+    const logoPath = path.join(__dirname, '../../logo100.png');
     if (fs.existsSync(logoPath)) {
       doc.image(logoPath, (doc.page.width - 200) / 2, 80, { width: 200 });
     }
@@ -211,7 +211,7 @@ const generatePDF = async (req, res) => {
     const footerY = doc.page.height - 150;
     const paddingX = 70;
 
-    const msmePath = path.join(__dirname, '../../public/image.png');
+    const msmePath = path.join(__dirname, '../../image.png');
     if (fs.existsSync(msmePath)) {
       doc.image(msmePath, paddingX, footerY, { height: 75 });
     }
@@ -221,7 +221,7 @@ const generatePDF = async (req, res) => {
     const signY = footerY + 45;
     
     // Digital Signature Image
-    const signaturePath = path.join(__dirname, '../../public/signature.png');
+    const signaturePath = path.join(__dirname, '../../signature.png');
     if (fs.existsSync(signaturePath)) {
       doc.image(signaturePath, signatureX + 10, signY - 35, { width: 140 });
     }

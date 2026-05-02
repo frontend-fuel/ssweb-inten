@@ -21,7 +21,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Static folder for frontend
-app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, '..')));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/certificate_system')
@@ -35,10 +35,10 @@ app.use('/api/students', studentRoutes);
 app.use('/api/lms', lmsRoutes);
 
 // Frontend routes
-app.get('/', (req, res) => res.sendFile(path.join(__dirname, '../public/index.html')));
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, '../index.html')));
 app.get('/login', (req, res) => res.redirect('/'));
-app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, '../public/dashboard.html')));
-app.get('/verify', (req, res) => res.sendFile(path.join(__dirname, '../public/verify.html')));
+app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, '../dashboard.html')));
+app.get('/verify', (req, res) => res.sendFile(path.join(__dirname, '../verify.html')));
 
 // ✅ Self-Hosted Certificate Redirect — QR codes point here
 // If domain changes → run PUT /api/certificates/update-domain to update all DB records instantly
@@ -51,8 +51,8 @@ app.get('/r/:id', (req, res) => {
 // Student Frontend routes (login & register now on index.html)
 app.get('/student/login', (req, res) => res.redirect('/'));
 app.get('/student/register', (req, res) => res.redirect('/'));
-app.get('/student/dashboard', (req, res) => res.sendFile(path.join(__dirname, '../public/student-dashboard.html')));
-app.get('/student/course', (req, res) => res.sendFile(path.join(__dirname, '../public/course-view.html')));
+app.get('/student/dashboard', (req, res) => res.sendFile(path.join(__dirname, '../student-dashboard.html')));
+app.get('/student/course', (req, res) => res.sendFile(path.join(__dirname, '../course-view.html')));
 
 const PORT = process.env.PORT || 5000;
 

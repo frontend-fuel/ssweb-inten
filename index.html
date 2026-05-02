@@ -297,7 +297,7 @@
 
     <!-- Logo -->
     <div class="logo-area">
-        <img src="logo100.png" alt="SS WebTech">
+        <img src="/logo100.png" alt="SS WebTech">
     </div>
 
     <!-- Role Switcher -->
@@ -344,7 +344,7 @@
             </form>
 
             <div class="verify-link">
-                Want to verify a certificate? <a href="/verify.html">Verify Here →</a>
+                Want to verify a certificate? <a href="/verify">Verify Here →</a>
             </div>
         </div>
 
@@ -424,7 +424,7 @@
             </form>
 
             <div class="verify-link">
-                <a href="/verify.html">Verify a Certificate →</a>
+                <a href="/verify">Verify a Certificate →</a>
             </div>
         </div>
 
@@ -518,7 +518,7 @@
             if (res.ok) {
                 localStorage.setItem('adminToken', data.token);
                 localStorage.setItem('adminUsername', data.username);
-                window.location.href = '/dashboard.html';
+                window.location.href = '/dashboard';
             } else {
                 showAlert('adminError', data.message || 'Invalid credentials');
                 btn.disabled = false;
@@ -604,7 +604,7 @@
     });
 
     // ─── Auto-redirect if already logged in ──────────────────────────────────
-    if (localStorage.getItem('adminToken'))   window.location.href = '/dashboard.html';
+    if (localStorage.getItem('adminToken'))   window.location.href = '/dashboard';
     if (localStorage.getItem('studentToken')) window.location.href = '/student/dashboard';
 </script>
 </body>
