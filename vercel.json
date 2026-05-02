@@ -4,28 +4,20 @@
   "trailingSlash": false,
   "functions": {
     "api/index.js": {
-      "includeFiles": "{server/**,*.png,*.jpg,*.svg,*.ico,*.css,*.js}"
-    }
-  },
-  "headers": [
+  "builds": [
     {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        }
-      ]
+      "src": "server/server.js",
+      "use": "@vercel/node"
     }
   ],
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api"
+      "src": "/api/(.*)",
+      "dest": "server/server.js"
     },
     {
-      "source": "/r/(.*)",
-      "destination": "/api"
+      "src": "/r/(.*)",
+      "dest": "server/server.js"
     }
   ]
 }

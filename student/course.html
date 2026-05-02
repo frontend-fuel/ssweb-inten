@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/js/config.js"></script>
     
     <!-- Markdown & Highlighting -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -129,11 +130,28 @@
 </head>
 <body>
     <aside>
-        <div class="sidebar-header" style="text-align: center; padding: 25px 20px;">
-            <img src="/logo100.png" alt="SS WebTech" style="height: 50px; margin-bottom: 20px;">
-            <a href="/student/dashboard" class="back-link" style="display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; background: #f8fafc; border: 1px solid var(--gray-border); padding: 10px; border-radius: 12px; color: var(--text-muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.3s;">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
-            </a>
+        <div class="sidebar-header" style="padding: 25px 20px;">
+            <div style="text-align: center;">
+                <img src="/logo100.png" alt="SS WebTech" style="height: 50px; margin-bottom: 20px;">
+                <a href="/student/dashboard" class="back-link" style="display: flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; background: #f8fafc; border: 1px solid var(--gray-border); padding: 10px; border-radius: 12px; color: var(--text-muted); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.3s;">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+
+            <!-- Progress Tracker Card -->
+            <div style="margin-top: 25px; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid var(--gray-border); border-radius: 16px; padding: 15px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <span style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Mastery Level</span>
+                    <span id="masteryPercent" style="font-size: 12px; font-weight: 800; color: var(--primary);">0%</span>
+                </div>
+                <div style="height: 6px; background: #e2e8f0; border-radius: 10px; overflow: hidden; margin-bottom: 10px;">
+                    <div id="progressFill" style="height: 100%; width: 0%; background: var(--primary); transition: width 0.8s ease-out;"></div>
+                </div>
+                <div style="font-size: 11px; font-weight: 700; color: var(--dark); display: flex; align-items: center; gap: 6px;">
+                    <i class="fas fa-award" style="color: #f59e0b;"></i>
+                    <span id="completedModulesCount">0 / 8 Modules</span>
+                </div>
+            </div>
         </div>
         <nav id="sidebarWeeks" style="padding-top: 10px;"></nav>
     </aside>
@@ -162,49 +180,74 @@
         const studentToken = localStorage.getItem('studentToken');
         if (!studentToken) window.location.href = '/';
 
+        window.API_URL = '/v1/api';
+
         let courseData = null;
         let activeLessonId = null;
 
         function escapeHTML(str) { return str.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m])); }
 
+        function updateProgressUI() {
+            if (!courseData) return;
+            
+            // 1. Calculate Module Mastery (Quizzes Passed)
+            const completedModulesCount = courseData.progress?.completedModules?.length || 0;
+            const totalModules = courseData.modules.length || 8;
+            const masteryPercent = Math.round((completedModulesCount / totalModules) * 100);
+
+            // 2. Calculate Overall Lesson Progress (Granular)
+            let totalLessons = 0;
+            courseData.modules.forEach(m => totalLessons += m.lessons.length);
+            const completedLessonsCount = courseData.progress?.completedLessons?.length || 0;
+            const overallProgressPercent = Math.round((completedLessonsCount / totalLessons) * 100);
+
+            // Update UI Elements
+            const countEl = document.getElementById('completedModulesCount');
+            const percentEl = document.getElementById('masteryPercent');
+            const fillEl = document.getElementById('progressFill');
+
+            if (countEl) countEl.innerText = `${completedModulesCount} / ${totalModules} Modules Mastered`;
+            if (percentEl) percentEl.innerText = `${overallProgressPercent}%`; // Showing lesson progress here
+            if (fillEl) fillEl.style.width = `${overallProgressPercent}%`;
+            
+            // You can also add a tooltip or secondary text for Mastery if needed
+            percentEl.title = `Modules Mastered: ${masteryPercent}%`;
+        }
+
         async function init() {
-            const res = await fetch('/api/lms/course', { headers: { 'Authorization': `Bearer ${studentToken}` } });
+            const res = await fetch(`${window.API_URL}/lms/course`, { headers: { 'Authorization': `Bearer ${studentToken}` } });
             courseData = await res.json();
+            
+            updateProgressUI();
             renderSidebar();
             renderLearningPath(); // Show roadmap on landing
         }
 
         function renderLearningPath() {
             const container = document.getElementById('lessonContent');
-            const weeks = {};
-            courseData.modules.forEach(m => {
-                if (!weeks[m.week]) weeks[m.week] = [];
-                weeks[m.week].push(m);
-            });
+            const completedModules = courseData.progress?.completedModules || [];
 
             container.innerHTML = `
                 <div class="syllabus-view" style="text-align: center;">
                     <img src="/logo.png" alt="SS WebTech" style="height: 150px; margin-bottom: 30px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1));">
                     <br>
                     <span style="color: var(--primary); font-weight: 800; font-size: 11px; text-transform: uppercase; letter-spacing: 2px;">Professional Journey</span>
-                    <h1 class="premium-title" style="margin-top: 10px;">Learning Path</h1>
-                    <p style="color: var(--text-muted); margin-bottom: 50px; font-size: 18px; max-width: 600px; margin-left: auto; margin-right: auto;">Your professional 8-week journey to becoming a Senior Full Stack Developer.</p>
+                    <h1 class="premium-title" style="margin-top: 10px;">Masterclass Roadmap</h1>
+                    <p style="color: var(--text-muted); margin-bottom: 50px; font-size: 18px; max-width: 600px; margin-left: auto; margin-right: auto;">Complete your professional 8-module journey to becoming a Certified Full Stack Developer.</p>
                     
-                    <div class="syllabus-grid">
-                        ${Object.keys(weeks).sort((a, b) => a - b).map(weekNum => `
-                            <div class="syllabus-week" style="margin-bottom: 40px; text-align: left;">
-                                <h3 style="font-family: 'Space Grotesk'; font-size: 20px; margin-bottom: 20px; color: var(--primary); text-align: center;">Week ${weekNum}</h3>
-                                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; justify-content: center;">
-                                    ${weeks[weekNum].map(m => `
-                                        <div class="concept-card" style="margin: 0; padding: 20px; cursor: pointer; transition: all 0.3s;" 
-                                             onclick="toggleModule('${m._id}')">
-                                            <h4 style="font-size: 15px; margin-bottom: 10px;">${m.title}</h4>
-                                            <span style="font-size: 12px; color: var(--text-muted);">${m.lessons.length} Lessons</span>
-                                        </div>
-                                    `).join('')}
+                    <div class="syllabus-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; justify-content: center;">
+                        ${courseData.modules.map((m, i) => {
+                            const isDone = completedModules.includes(m._id);
+                            return `
+                                <div class="concept-card" style="margin: 0; padding: 30px; cursor: pointer; position: relative; border: 2px solid ${isDone ? '#10b981' : 'var(--gray-border)'};" 
+                                     onclick="toggleModule('${m._id}')">
+                                    <div style="font-size: 10px; font-weight: 800; color: var(--primary); text-transform: uppercase; margin-bottom: 10px;">Module ${i + 1}</div>
+                                    <h3 style="font-family: 'Space Grotesk'; font-size: 20px; margin-bottom: 15px;">${m.title}</h3>
+                                    <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5;">${m.lessons.length} Professional Lessons</p>
+                                    ${isDone ? '<div style="position: absolute; top: 15px; right: 15px; color: #10b981; font-size: 20px;"><i class="fas fa-check-circle"></i></div>' : ''}
                                 </div>
-                            </div>
-                        `).join('')}
+                            `;
+                        }).join('')}
                     </div>
                 </div>
             `;
@@ -212,78 +255,59 @@
 
         function renderSidebar() {
             const sidebar = document.getElementById('sidebarWeeks');
-            const weeks = {};
-            courseData.modules.forEach(m => {
-                if (!weeks[m.week]) weeks[m.week] = [];
-                weeks[m.week].push(m);
-            });
-
             const completedLessons = courseData.progress?.completedLessons || [];
             const completedModules = courseData.progress?.completedModules || [];
 
-            sidebar.innerHTML = Object.keys(weeks).sort((a, b) => a - b).map((weekNum, wIdx) => {
-                const modulesInWeek = weeks[weekNum];
-                
-                // Week 1 is unlocked by default. Subsequent weeks require the last module of the previous week to be completed.
-                let weekLocked = false;
-                if (weekNum > 1) {
-                    const prevWeekNum = Object.keys(weeks)[wIdx - 1];
-                    const lastModOfPrevWeek = weeks[prevWeekNum].slice(-1)[0];
-                    if (!completedModules.includes(lastModOfPrevWeek._id)) {
-                        weekLocked = true;
-                    }
-                }
+            sidebar.innerHTML = courseData.modules.map((m, mIdx) => {
+                // LOCK REMOVED FOR REVIEW: Module locking is temporarily disabled
+                let isLocked = false;
+
+                // Final project module (Module 8) special title
+                const displayTitle = mIdx === 7 ? "🎓 Final Capstone" : m.title;
+                // Calculate per-module progress
+                const moduleLessons = m.lessons;
+                const completedInModule = moduleLessons.filter(l => completedLessons.includes(l._id)).length;
+                const modulePercent = Math.round((completedInModule / moduleLessons.length) * 100);
 
                 return `
-                <div class="week-container">
-                    <div class="week-header"><i class="fas fa-calendar-week"></i> Week ${weekNum}</div>
-                    ${modulesInWeek.map((m, mIdx) => {
-                        // Module 1 of Week 1 is unlocked. 
-                        // Others depend on the last lesson of the previous module (in the same week) or previous week completion.
-                        let mLocked = weekLocked;
-                        if (!mLocked && mIdx > 0) {
-                            const prevMod = modulesInWeek[mIdx-1];
-                            const lastLessonOfPrevMod = prevMod.lessons[prevMod.lessons.length - 1];
-                            if (!completedLessons.includes(lastLessonOfPrevMod._id)) {
-                                mLocked = true;
-                            }
-                        }
-
-                        return `
-                        <div class="module-item">
-                            <div class="module-header ${mLocked ? 'locked' : ''}" onclick="${mLocked ? '' : `toggleModule('${m._id}')`}">
-                                <span>${m.title.split(': ')[1] || m.title}</span>
-                                <i class="fas ${mLocked ? 'fa-lock' : 'fa-chevron-down'}"></i>
+                <div class="week-container ${isLocked ? 'locked' : ''}">
+                    <div class="week-header">
+                        <i class="fas ${isLocked ? 'fa-lock' : 'fa-layer-group'}"></i> 
+                        Module ${mIdx + 1} ${isLocked ? '(Locked)' : ''}
+                    </div>
+                    <div class="module-item">
+                        <div class="module-header" onclick="${isLocked ? '' : `toggleModule('${m._id}')`}" style="flex-direction: column; align-items: flex-start; gap: 5px;">
+                            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                                <span>${displayTitle}</span>
+                                <i class="fas ${isLocked ? 'fa-lock' : 'fa-chevron-down'}"></i>
                             </div>
-                            <div class="lesson-list" id="list-${m._id}" style="${mLocked ? 'display: none;' : (activeLessonId && m.lessons.some(l => l._id === activeLessonId) ? 'display: block;' : 'display: none;')}">
-                                ${m.lessons.map((l, lIdx) => {
-                                    // First lesson of the first unlocked module is unlocked.
-                                    let lLocked = mLocked;
-                                    if (!lLocked && lIdx > 0) {
-                                        const prevLesson = m.lessons[lIdx - 1];
-                                        if (!completedLessons.includes(prevLesson._id)) {
-                                            lLocked = true;
-                                        }
-                                    }
-
-                                    const isDone = completedLessons.includes(l._id);
-                                    return `
-                                        <div class="lesson-item ${lLocked ? 'locked' : ''} ${isDone ? 'completed' : ''} ${activeLessonId === l._id ? 'active' : ''}" 
-                                             onclick="${lLocked ? '' : `synthesizeLesson(${JSON.stringify(l).replace(/"/g, '&quot;')}, '${m._id}')`}">
-                                            <i class="fas ${isDone ? 'fa-check-circle' : (lLocked ? 'fa-lock' : 'fa-circle')}"></i>
-                                            ${l.title}
-                                        </div>
-                                    `;
-                                }).join('')}
-                                ${m.quiz && m.quiz.length > 0 ? `
-                                    <div class="quiz-item ${!completedLessons.includes(m.lessons[m.lessons.length - 1]._id) ? 'locked' : ''}" 
-                                         onclick="${!completedLessons.includes(m.lessons[m.lessons.length - 1]._id) ? '' : `startQuiz('${m._id}')`}">
-                                        <i class="fas fa-tasks"></i> Weekly Assignment
-                                    </div>
-                                ` : ''}
-                            </div>
+                            ${!isLocked ? `
+                                <div style="width: 100%; height: 3px; background: #e2e8f0; border-radius: 10px; overflow: hidden; margin-top: 5px;">
+                                    <div style="height: 100%; width: ${modulePercent}%; background: ${modulePercent === 100 ? '#10b981' : 'var(--primary)'}; transition: width 0.5s;"></div>
+                                </div>
+                                <span style="font-size: 9px; font-weight: 800; color: var(--text-muted);">${modulePercent}% Complete</span>
+                            ` : ''}
                         </div>
-                    `}).join('')}
+                        <div class="lesson-list" id="list-${m._id}" style="${activeLessonId && m.lessons.some(l => l._id === activeLessonId) ? 'display: block;' : 'display: none;'}">
+                            ${m.lessons.map((l, lIdx) => {
+                                const isDone = completedLessons.includes(l._id);
+                                return `
+                                    <div class="lesson-item ${isDone ? 'completed' : ''} ${activeLessonId === l._id ? 'active' : ''}" 
+                                         onclick="synthesizeLesson(${JSON.stringify(l).replace(/"/g, '&quot;')}, '${m._id}')">
+                                        <i class="fas ${isDone ? 'fa-check-circle' : 'fa-circle'}"></i>
+                                        ${l.title}
+                                    </div>
+                                `;
+                            }).join('')}
+                            
+                            ${m.quiz && m.quiz.length > 0 ? `
+                                <div class="quiz-item ${completedModules.includes(m._id) ? 'completed' : ''}" onclick="startQuiz('${m._id}')">
+                                    <i class="fas ${completedModules.includes(m._id) ? 'fa-certificate' : 'fa-tasks'}"></i> 
+                                    ${completedModules.includes(m._id) ? 'Assessment Passed' : 'Final Assessment'}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
                 </div>
             `}).join('');
         }
@@ -294,49 +318,29 @@
         }
 
         async function synthesizeLesson(lesson, moduleId) {
-            activeLessonId = lesson._id; renderSidebar();
+            activeLessonId = lesson._id; 
+            renderSidebar();
             const container = document.getElementById('lessonContent');
             const mod = courseData.modules.find(m => m._id === moduleId);
             
             // Check for Special Submission View
-            if (lesson.aiGeneratedContent === 'SPECIAL_SUBMISSION_VIEW') {
+            if (lesson.content === 'SPECIAL_SUBMISSION_VIEW') {
                 renderSubmissionView();
                 return;
             }
 
-            // Check if content is already cached in memory
-            if (lesson.aiGeneratedContent) {
-                console.log(`[Instant Load] Serving cached content for: ${lesson.title}`);
-                renderLesson(lesson, mod, lesson.aiGeneratedContent);
+            // Use stored content if available
+            if (lesson.content) {
+                renderLesson(lesson, mod, lesson.content);
                 return;
             }
 
             container.innerHTML = `
                 <div class="ai-loading">
                     <div class="ai-pulse"><i class="fas fa-magic"></i></div>
-                    <h2 style="font-family: 'Space Grotesk';">Synthesizing ${lesson.title}...</h2>
-                    <p>Building your one-by-one mastery path.</p>
+                    <h2 style="font-family: 'Space Grotesk';">Loading ${lesson.title}...</h2>
                 </div>
             `;
-
-            try {
-                const res = await fetch('/api/lms/ai-explain', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${studentToken}` },
-                    body: JSON.stringify({ 
-                        topic: lesson.title, 
-                        content: lesson.content,
-                        moduleId: moduleId,
-                        lessonId: lesson._id
-                    })
-                });
-                const data = await res.json();
-                
-                // Save back to local object so it's instant next time
-                lesson.aiGeneratedContent = data.explanation;
-                
-                renderLesson(lesson, mod, data.explanation);
-            } catch (err) { container.innerHTML = '<h2>Synthesis Error</h2>'; }
         }
 
         function renderLesson(lesson, mod, explanation) {
@@ -367,7 +371,7 @@
                     <div id="completionZone" style="margin-top: 40px; text-align: center;">
                         ${isLessonDone ? 
                             `<div style="color: #10b981; font-weight: 800; padding: 20px; background: #f0fdf4; border-radius: 20px;"><i class="fas fa-check-circle"></i> Lesson Mastered</div>` : 
-                            `<button class="btn-action" id="markDoneBtn" onclick="markDone('${lesson._id}')">Mark as Complete</button>`
+                            `<button class="btn-action" id="markDoneBtn" onclick="markLessonAsDone('${lesson._id}')">Mark as Complete</button>`
                         }
                     </div>
 
@@ -388,29 +392,27 @@
             hljs.highlightAll();
         }
 
-        async function markDone(lessonId) {
-            const btn = document.getElementById('markDoneBtn');
-            btn.disabled = true;
-            btn.textContent = 'Recording Progress...';
-            
+        async function markLessonAsDone(lessonId) {
             try {
-                await fetch(`/api/lms/lessons/${lessonId}/complete`, {
+                const res = await fetch(`${window.API_URL}/lms/lessons/${lessonId}/complete`, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${studentToken}` }
                 });
-                
-                if (!courseData.progress.completedLessons) courseData.progress.completedLessons = [];
-                if (!courseData.progress.completedLessons.includes(lessonId)) {
-                    courseData.progress.completedLessons.push(lessonId);
+                if (res.ok) {
+                    // Update local data for instant UI feedback
+                    if (!courseData.progress.completedLessons.includes(lessonId)) {
+                        courseData.progress.completedLessons.push(lessonId);
+                    }
+                    renderSidebar();
+                    
+                    const btn = document.querySelector('.btn-action');
+                    if (btn) {
+                        btn.innerHTML = '<i class="fas fa-check-circle"></i> Lesson Completed';
+                        btn.style.background = '#10b981';
+                    }
+                    document.getElementById('nextNavBtn').style.display = 'flex';
                 }
-                
-                renderSidebar();
-                document.getElementById('completionZone').innerHTML = `<div style="color: #10b981; font-weight: 800; padding: 20px; background: #f0fdf4; border-radius: 20px;"><i class="fas fa-check-circle"></i> Lesson Mastered</div>`;
-                document.getElementById('nextNavBtn').style.display = 'flex';
-            } catch (err) { 
-                btn.disabled = false;
-                btn.textContent = 'Try Again';
-            }
+            } catch (err) { console.error(err); }
         }
 
         async function startQuiz(mid) {
@@ -418,7 +420,7 @@
             const container = document.getElementById('lessonContent');
             container.innerHTML = `
                 <div class="quiz-container">
-                    <h1 class="premium-title">Week ${module.week} Assignment</h1>
+                    <h1 class="premium-title">${module.title} Assessment</h1>
                     ${module.quiz.map((q, i) => `
                         <div class="quiz-question" style="margin-bottom: 40px;">
                             <h3 style="margin-bottom: 20px;">${i + 1}. ${escapeHTML(q.question)}</h3>
@@ -440,7 +442,7 @@
 
         async function submitQuiz(mid) {
             if (window.ans.includes(null)) return alert('Answer all questions!');
-            const res = await fetch(`/api/lms/modules/${mid}/quiz`, {
+            const res = await fetch(`${window.API_URL}/lms/modules/${mid}/quiz`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${studentToken}` },
                 body: JSON.stringify({ answers: window.ans })
@@ -451,6 +453,7 @@
                     courseData.progress.completedModules.push(mid);
                 }
                 renderSidebar();
+                updateProgressUI(); // Update the mastery stats immediately
             }
             const modal = document.getElementById('quizModal');
             document.getElementById('modalTitle').textContent = result.passed ? 'Week Complete!' : 'Try Again';
@@ -501,7 +504,7 @@
             btn.textContent = 'Submitting your journey...';
 
             try {
-                const res = await fetch('/api/lms/project/submit', {
+                const res = await fetch(`${window.API_URL}/lms/project/submit`, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',

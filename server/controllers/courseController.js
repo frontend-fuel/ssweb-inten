@@ -11,9 +11,9 @@ const getCourse = async (req, res) => {
       return res.status(404).json({ message: 'Course not found' });
     }
 
-    const modules = await Module.find({ courseId: course._id }).sort({ week: 1, order: 1 });
+    // Since we upgraded the Course model to include modules internally
+    const modules = course.modules;
     
-    // Progress comes from req.student (populated by studentProtect middleware)
     const progress = {
         completedModules: req.student.completedModules || [],
         completedLessons: req.student.completedLessons || [],
@@ -67,10 +67,17 @@ const submitQuiz = async (req, res) => {
     const passed = scorePercent >= 70;
 
     if (passed) {
-      // Add to completedModules if not already there
-      await Student.findByIdAndUpdate(req.student._id, {
-        $addToSet: { completedModules: req.params.id }
-      });
+      // REQUIREMENT: All lessons in this module must be completed
+      const allLessonsDone = module.lessons.every(l => 
+        student.completedLessons.includes(l._id.toString())
+      );
+
+      if (allLessonsDone) {
+        // Add to completedModules if not already there
+        await Student.findByIdAndUpdate(req.student._id, {
+          $addToSet: { completedModules: req.params.id }
+        });
+      }
     }
 
     // Update quiz scores using findByIdAndUpdate to avoid password validation issues

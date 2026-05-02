@@ -12,6 +12,7 @@
     
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/js/config.js"></script>
 
     <style>
         :root {
@@ -793,16 +794,21 @@
 
         async function loadData() {
             try {
-                const res = await fetch('/api/lms/course', {
+                const res = await fetch('/v1/api/lms/course', {
                     headers: { 'Authorization': `Bearer ${studentToken}` }
                 });
                 const data = await res.json();
                 if (res.ok) {
                     renderCourse(data.course);
                     
-                    const totalModules = data.modules.length;
+                    const totalModules = data.modules.length || 8;
                     const completedModulesCount = data.progress?.completedModules?.length || 0;
-                    const percentage = totalModules > 0 ? Math.round((completedModulesCount / totalModules) * 100) : 0;
+                    
+                    // Calculate granular lesson progress
+                    let totalLessons = 0;
+                    data.modules.forEach(m => totalLessons += m.lessons.length);
+                    const completedLessonsCount = data.progress?.completedLessons?.length || 0;
+                    const percentage = totalLessons > 0 ? Math.round((completedLessonsCount / totalLessons) * 100) : 0;
 
                     document.querySelector('.coursesCount').textContent = data.course ? 1 : 0;
                     document.querySelector('.modulesCompletedCount').textContent = `${completedModulesCount} / ${totalModules}`;
@@ -843,7 +849,7 @@
             const tbody = document.getElementById('certificatesTableBody');
             tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 50px;"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
             try {
-                const res = await fetch('/api/students/certificates', {
+                const res = await fetch('/v1/api/students/certificates', {
                     headers: { 'Authorization': `Bearer ${studentToken}` }
                 });
                 const certs = await res.json();
@@ -859,16 +865,16 @@
                         <td><span style="padding: 5px 12px; border-radius: 50px; font-size: 11px; background: #f0fdf4; color: #10b981; border: 1px solid #dcfce7;">ACTIVE</span></td>
                         <td>
                             <div style="display: flex; gap: 8px;">
-                                <a href="/api/certificates/${c.certificateId}/pdf?preview=true&layout=portrait" target="_blank" class="btn-icon" title="Portrait Preview" style="color: #10b981; background: #f0fdf4; width: 35px; height: 35px; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid #dcfce7; text-decoration: none;">
+                                <a href="/v1/api/certificates/${c.certificateId}/pdf?preview=true&layout=portrait" target="_blank" class="btn-icon" title="Portrait Preview" style="color: #10b981; background: #f0fdf4; width: 35px; height: 35px; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid #dcfce7; text-decoration: none;">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a href="/api/certificates/${c.certificateId}/pdf?preview=true&layout=landscape" target="_blank" class="btn-icon" title="Landscape Preview" style="color: #10b981; background: #f0fdf4; width: 35px; height: 35px; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid #dcfce7; text-decoration: none;">
+                                <a href="/v1/api/certificates/${c.certificateId}/pdf?preview=true&layout=landscape" target="_blank" class="btn-icon" title="Landscape Preview" style="color: #10b981; background: #f0fdf4; width: 35px; height: 35px; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid #dcfce7; text-decoration: none;">
                                     <i class="fas fa-window-maximize"></i>
                                 </a>
-                                <a href="/api/certificates/${c.certificateId}/pdf?layout=portrait" target="_blank" class="btn-icon" title="Portrait Download" style="color: #3b82f6; background: #eff6ff; width: 35px; height: 35px; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid #e0f2fe; text-decoration: none;">
+                                <a href="/v1/api/certificates/${c.certificateId}/pdf?layout=portrait" target="_blank" class="btn-icon" title="Portrait Download" style="color: #3b82f6; background: #eff6ff; width: 35px; height: 35px; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid #e0f2fe; text-decoration: none;">
                                     <i class="fas fa-file-invoice"></i>
                                 </a>
-                                <a href="/api/certificates/${c.certificateId}/pdf?layout=landscape" target="_blank" class="btn-icon" title="Landscape Download" style="color: #8b5cf6; background: #f3f0ff; width: 35px; height: 35px; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid #ede9fe; text-decoration: none;">
+                                <a href="/v1/api/certificates/${c.certificateId}/pdf?layout=landscape" target="_blank" class="btn-icon" title="Landscape Download" style="color: #8b5cf6; background: #f3f0ff; width: 35px; height: 35px; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid #ede9fe; text-decoration: none;">
                                     <i class="fas fa-file-alt"></i>
                                 </a>
                             </div>
@@ -880,7 +886,7 @@
 
         async function loadProfile() {
             try {
-                const res = await fetch('/api/students/profile', {
+                const res = await fetch('/v1/api/students/profile', {
                     headers: { 'Authorization': `Bearer ${studentToken}` }
                 });
                 const profile = await res.json();
@@ -912,7 +918,7 @@
             btn.textContent = 'Updating...';
 
             try {
-                const res = await fetch('/api/students/change-password', {
+                const res = await fetch('/v1/api/students/change-password', {
                     method: 'PUT',
                     headers: { 
                         'Content-Type': 'application/json',

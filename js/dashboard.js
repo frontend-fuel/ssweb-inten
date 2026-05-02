@@ -19,8 +19,8 @@ const modalTitle = document.getElementById('modalTitle');
 const statusGroup = document.getElementById('statusGroup');
 const tableLoader = document.getElementById('tableLoader');
 
-// API Base URL
-const API_URL = '/api';
+// API Base URL (Hardcoded for stability)
+const API_URL = '/v1/api';
 
 // Fetch stats and certificates
 async function fetchData() {
@@ -268,7 +268,7 @@ navItems.forEach(item => {
 // Student Management Logic
 async function fetchStudents() {
     try {
-        const res = await fetch(`${API_URL}/admin/students`, {
+        const res = await fetch('/v1/api/admin/students', {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         const students = await res.json();
@@ -298,6 +298,7 @@ function renderStudentsTable(students) {
             <td style="font-weight: 700; color: var(--dark);">${student.name}</td>
             <td style="color: var(--text-muted); font-size: 13px;">${student.email}</td>
             <td style="color: var(--primary); font-weight: 800;">${student.progressPercentage || 0}%</td>
+            <td style="color: #10b981; font-weight: 800;">${student.masteryCount || '0 / 8'}</td>
             <td>
                 ${student.projectLink ? 
                     `<a href="${student.projectLink}" target="_blank" style="color: #8b5cf6; text-decoration: none; font-weight: 800; display: flex; align-items: center; gap: 5px;">

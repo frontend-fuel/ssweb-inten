@@ -4,7 +4,7 @@ const courseSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
-    default: 'Full Stack Web Development - HTML, CSS, JS, Node.js, MongoDB'
+    default: 'Full Stack Web Development (MERN)'
   },
   description: {
     type: String,
@@ -12,7 +12,21 @@ const courseSchema = new mongoose.Schema({
   },
   thumbnail: {
     type: String
-  }
+  },
+  modules: [{
+    title: String,
+    lessons: [{
+      title: String,
+      content: String,
+      videoUrl: String,
+      order: Number
+    }],
+    quiz: [{
+      question: String,
+      options: [String],
+      correctAnswer: Number // Index of the correct option
+    }]
+  }]
 }, {
   timestamps: true
 });

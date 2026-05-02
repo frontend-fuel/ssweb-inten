@@ -20,6 +20,12 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// 🚀 MOVED: Mount routes BEFORE static files to prevent folder conflicts
+app.use('/v1/api/admin', adminRoutes);
+app.use('/v1/api/certificates', certificateRoutes);
+app.use('/v1/api/students', studentRoutes);
+app.use('/v1/api/lms', lmsRoutes);
+
 // Static folder for frontend
 app.use(express.static(path.join(__dirname, '..')));
 
@@ -28,15 +34,15 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/certifica
   .then(() => console.log('MongoDB Connected'))
   .catch(err => console.log(err));
 
-// Mount routes
-app.use('/api/admin', adminRoutes);
-app.use('/api/certificates', certificateRoutes);
-app.use('/api/students', studentRoutes);
-app.use('/api/lms', lmsRoutes);
-
 // Frontend routes
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, '../index.html')));
-app.get('/login', (req, res) => res.redirect('/'));
+app.get('/login', (req, res) => res.sendFile(path.join(__dirname, '../login.html')));
+app.get('/admin', (req, res) => res.redirect('/login'));
+app.get('/admin/login', (req, res) => res.redirect('/login'));
+
+// Safety Fallback for legacy POST login attempts
+app.post('/admin/login', (req, res) => res.redirect(307, '/v1/api/admin/login'));
+
 app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, '../dashboard.html')));
 app.get('/verify', (req, res) => res.sendFile(path.join(__dirname, '../verify.html')));
 app.get('/ledger', (req, res) => res.sendFile(path.join(__dirname, '../ledger.html')));

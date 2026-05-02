@@ -13,6 +13,7 @@
 
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="/js/config.js"></script>
 
     <style>
         :root {
@@ -549,6 +550,8 @@
 </div>
 
 <script>
+    window.API_URL = '/v1/api';
+
     // ─── Role Switcher ───────────────────────────────────────────────────────
     function switchRole(role) {
         const adminPanel   = document.getElementById('adminPanel');
@@ -617,7 +620,7 @@
         btnIcon.className = 'fas fa-spinner fa-spin';
 
         try {
-            const res = await fetch('/api/admin/login', {
+            const res = await fetch(`${window.API_URL}/admin/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -654,7 +657,7 @@
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
 
         try {
-            const res = await fetch('/api/students/login', {
+            const res = await fetch(`${window.API_URL}/students/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -689,7 +692,7 @@
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Registering...';
 
         try {
-            const res = await fetch('/api/students/register', {
+            const res = await fetch(`${window.API_URL}/students/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

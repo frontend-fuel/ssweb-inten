@@ -60,21 +60,37 @@ const setupAdmin = async (req, res) => {
 
 const Student = require('../models/Student');
 
+const Course = require('../models/Course');
+
 // @desc    Get all students
 // @route   GET /api/admin/students
 const getStudents = async (req, res) => {
-  const Module = require('../models/Module');
   try {
-    const totalModulesCount = await Module.countDocuments();
+    const course = await Course.findOne();
+    if (!course) return res.json([]);
+
+    // Calculate totals and get all valid lesson IDs
+    const totalModulesCount = course.modules.length;
+    let allValidLessonIds = [];
+    course.modules.forEach(m => {
+        m.lessons.forEach(l => allValidLessonIds.push(l._id.toString()));
+    });
+    const totalLessonsCount = allValidLessonIds.length;
+
     const students = await Student.find().sort({ createdAt: -1 });
     
     const studentsWithProgress = students.map(s => {
-      const completedCount = s.completedModules ? s.completedModules.length : 0;
-      const percent = totalModulesCount > 0 ? Math.round((completedCount / totalModulesCount) * 100) : 0;
+      // Only count completed lessons that still exist in the current course
+      const validCompletedLessons = s.completedLessons ? 
+        s.completedLessons.filter(id => allValidLessonIds.includes(id.toString())) : [];
+      
+      const completedModulesCount = s.completedModules ? s.completedModules.length : 0;
+      const lessonPercent = totalLessonsCount > 0 ? Math.round((validCompletedLessons.length / totalLessonsCount) * 100) : 0;
       
       return {
         ...s.toObject(),
-        progressPercentage: percent
+        progressPercentage: lessonPercent,
+        masteryCount: `${completedModulesCount} / ${totalModulesCount}`
       };
     });
 
