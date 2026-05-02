@@ -16,6 +16,14 @@
       "destination": "/api"
     },
     {
+      "source": "/dashboard",
+      "destination": "/dashboard.html"
+    },
+    {
+      "source": "/verify",
+      "destination": "/verify.html"
+    },
+    {
       "source": "/student/dashboard",
       "destination": "/student-dashboard.html"
     },
