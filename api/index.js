@@ -79,6 +79,15 @@ app.get('/student/login', (req, res) => res.redirect('/'));
 app.get('/student/register', (req, res) => res.redirect('/'));
 app.get('/student/dashboard', (req, res) => res.sendFile(path.join(__dirname, '../student/dashboard.html')));
 app.get('/student/course', (req, res) => res.sendFile(path.join(__dirname, '../student/course.html')));
+// Catch-all 404 for Express
+app.use((req, res) => {
+    console.log(`[404] No route matched for: ${req.url}`);
+    res.status(404).json({ 
+        message: 'Route not found in Express', 
+        path: req.url,
+        method: req.method 
+    });
+});
 
 const PORT = process.env.PORT || 5000;
 
