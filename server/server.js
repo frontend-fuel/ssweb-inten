@@ -51,8 +51,8 @@ app.get('/r/:id', (req, res) => {
 // Student Frontend routes (login & register now on index.html)
 app.get('/student/login', (req, res) => res.redirect('/'));
 app.get('/student/register', (req, res) => res.redirect('/'));
-app.get('/student/dashboard', (req, res) => res.sendFile(path.join(__dirname, '../student-dashboard.html')));
-app.get('/student/course', (req, res) => res.sendFile(path.join(__dirname, '../course-view.html')));
+app.get('/student/dashboard', (req, res) => res.sendFile(path.join(__dirname, '../student/dashboard.html')));
+app.get('/student/course', (req, res) => res.sendFile(path.join(__dirname, '../student/course.html')));
 
 const PORT = process.env.PORT || 5000;
 
