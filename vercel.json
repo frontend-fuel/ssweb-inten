@@ -1,23 +1,27 @@
 {
   "version": 2,
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "functions": {
-    "api/index.js": {
   "builds": [
     {
-      "src": "server/server.js",
+      "src": "api/index.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
+      "src": "/v1/api/(.*)",
+      "dest": "api/index.js"
+    },
+    {
       "src": "/api/(.*)",
-      "dest": "server/server.js"
+      "dest": "api/index.js"
     },
     {
       "src": "/r/(.*)",
-      "dest": "server/server.js"
+      "dest": "api/index.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/$1"
     }
   ]
 }

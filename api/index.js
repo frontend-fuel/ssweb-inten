@@ -49,6 +49,7 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok', environment: proce
 
 // Mount routes (Flexible mounting for Vercel)
 const mountRoutes = (path, handler) => {
+    app.use(`/v1/api${path}`, handler); // 🚀 Added Versioned Path
     app.use(`/api${path}`, handler);
     app.use(path, handler);
 };
