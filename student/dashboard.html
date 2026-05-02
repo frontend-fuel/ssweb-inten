@@ -747,7 +747,7 @@
         const studentToken = localStorage.getItem('studentToken');
         const studentName = localStorage.getItem('studentName');
 
-        if (!studentToken) window.location.href = '/student/login';
+        if (!studentToken) window.location.href = '/';
 
         // Tab Switching Logic
         const navItems = document.querySelectorAll('.nav-item');
@@ -784,7 +784,7 @@
         document.getElementById('logoutBtn').onclick = () => {
             localStorage.removeItem('studentToken');
             localStorage.removeItem('studentName');
-            window.location.href = '/student/login';
+            window.location.href = '/';
         };
 
         async function loadData() {
