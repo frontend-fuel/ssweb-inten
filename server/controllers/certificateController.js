@@ -168,41 +168,41 @@ const generatePDF = async (req, res) => {
     // 4. Logo Section
     const logoPath = path.join(__dirname, '../../logo100.png');
     if (fs.existsSync(logoPath)) {
-      const logoWidth = isLandscape ? 160 : 200;
-      doc.image(logoPath, (doc.page.width - logoWidth) / 2, isLandscape ? 40 : 80, { width: logoWidth });
+      const logoWidth = isLandscape ? 150 : 200;
+      doc.image(logoPath, (doc.page.width - logoWidth) / 2, isLandscape ? 35 : 80, { width: logoWidth });
     }
 
     // 5. Text Content Section
-    const titleY = isLandscape ? 115 : 200;
+    const titleY = isLandscape ? 105 : 200;
     doc.font('Helvetica-Bold').fontSize(isLandscape ? 28 : 24).fillColor('#1e3a8a').text('CERTIFICATE OF INTERNSHIP', 0, titleY, { align: 'center', characterSpacing: 2 });
-    doc.font('Helvetica').fontSize(11).fillColor('#64748b').text('THIS IS PROUDLY PRESENTED TO', 0, titleY + 40, { align: 'center', characterSpacing: 3 });
+    doc.font('Helvetica').fontSize(11).fillColor('#64748b').text('THIS IS PROUDLY PRESENTED TO', 0, titleY + 35, { align: 'center', characterSpacing: 3 });
     
-    const nameY = isLandscape ? 180 : 285;
+    const nameY = isLandscape ? 165 : 285;
     const nameText = certificate.studentName.toUpperCase();
     doc.font('Helvetica-Bold').fontSize(isLandscape ? 36 : 28.5).fillColor('#0f172a').text(nameText, 0, nameY, { align: 'center' });
 
     const textWidth = doc.widthOfString(nameText);
     const startX = (doc.page.width - textWidth) / 2;
-    doc.moveTo(startX - 20, nameY + (isLandscape ? 42 : 38)).lineTo(startX + textWidth + 20, nameY + (isLandscape ? 42 : 38)).strokeColor('#d4af37').lineWidth(3.5).stroke();
+    doc.moveTo(startX - 20, nameY + (isLandscape ? 40 : 38)).lineTo(startX + textWidth + 20, nameY + (isLandscape ? 40 : 38)).strokeColor('#d4af37').lineWidth(3.5).stroke();
 
-    const bodyY = isLandscape ? 255 : 365;
+    const bodyY = isLandscape ? 230 : 365;
     doc.font('Helvetica').fontSize(11).fillColor('#334155').text(`has successfully completed an Internship as a`, 0, bodyY, { align: 'center' });
-    doc.font('Helvetica-Bold').fontSize(isLandscape ? 15 : 13.5).fillColor('#1e3a8a').text(`${certificate.internshipDomain.toUpperCase()} at SS WebTech.`, 0, bodyY + 22, { align: 'center' });
+    doc.font('Helvetica-Bold').fontSize(isLandscape ? 15 : 13.5).fillColor('#1e3a8a').text(`${certificate.internshipDomain.toUpperCase()} at SS WebTech.`, 0, bodyY + 20, { align: 'center' });
 
     const start = new Date(certificate.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
     const end = new Date(certificate.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
-    doc.font('Helvetica-Bold').fontSize(11).fillColor('#475569').text(`Duration: ${start} to ${end}`, 0, bodyY + 50, { align: 'center' });
+    doc.font('Helvetica-Bold').fontSize(11).fillColor('#475569').text(`Duration: ${start} to ${end}`, 0, bodyY + 45, { align: 'center' });
 
     const summary = certificate.description || "During the internship period, the student was involved in designing, developing, and maintaining web applications. Working sincerely with the team, demonstrating good technical skills, dedication, and enthusiasm towards learning.";
-    doc.font('Helvetica').fontSize(isLandscape ? 11 : 11).fillColor('#475569').text(summary, 80, bodyY + 85, { align: 'center', lineGap: 4, width: doc.page.width - 160 });
+    doc.font('Helvetica').fontSize(isLandscape ? 11 : 11).fillColor('#475569').text(summary, 80, bodyY + 75, { align: 'center', lineGap: 3, width: doc.page.width - 160 });
 
-    doc.font('Helvetica-Bold').fontSize(11).fillColor('#0f172a').text(`Performance during the internship was found to be satisfactory.`, 0, doc.y + 25, { align: 'center' });
+    doc.font('Helvetica-Bold').fontSize(11).fillColor('#0f172a').text(`Performance during the internship was found to be satisfactory.`, 0, doc.y + (isLandscape ? 12 : 25), { align: 'center' });
 
     const issueDate = new Date(certificate.issueDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
     doc.font('Helvetica-Bold').fontSize(10).fillColor('#0f172a').text(`DATE: ${issueDate.toUpperCase()}`, 0, doc.y + 15, { align: 'center' });
 
     // 6. Footer Layout Constants (Define early for use in QR positioning)
-    const footerY = doc.page.height - (isLandscape ? 95 : 150);
+    const footerY = doc.page.height - (isLandscape ? 110 : 150);
     const paddingX = isLandscape ? 100 : 70;
 
     // QR Code Section
@@ -210,20 +210,20 @@ const generatePDF = async (req, res) => {
     const qrCodeImage = await QRCode.toDataURL(verificationUrl, { margin: 1 });
     const qrBuffer = Buffer.from(qrCodeImage.split(',')[1], 'base64');
     
-    const qrWidth = isLandscape ? 65 : 80;
-    const qrY = isLandscape ? footerY - 5 : (doc.y + 15);
-    const qrX = isLandscape ? paddingX + 200 : (doc.page.width - qrWidth) / 2;
+    const qrWidth = isLandscape ? 55 : 80;
+    const qrY = isLandscape ? footerY : (doc.y + 15);
+    const qrX = isLandscape ? (doc.page.width - qrWidth) / 2 : (doc.page.width - qrWidth) / 2;
     doc.image(qrBuffer, qrX, qrY, { width: qrWidth });
     
-    // Position ID text below the QR code (In portrait or landscape)
-    doc.font('Courier').fontSize(isLandscape ? 7 : 8).fillColor('#64748b').text(`ID: ${certificate.certificateId}`, isLandscape ? qrX : 0, qrY + qrWidth + 4, { align: isLandscape ? 'left' : 'center', width: isLandscape ? qrWidth : doc.page.width });
+    // Position ID text below the QR code
+    doc.font('Courier').fontSize(isLandscape ? 7 : 8).fillColor('#64748b').text(`ID: ${certificate.certificateId}`, 0, qrY + qrWidth + 4, { align: 'center', width: doc.page.width });
 
     // 6. Footer Section
     // (Constants already defined above)
 
     const msmePath = path.join(__dirname, '../../image.png');
     if (fs.existsSync(msmePath)) {
-      doc.image(msmePath, paddingX, footerY, { height: 75 });
+      doc.image(msmePath, paddingX, isLandscape ? footerY : footerY, { height: isLandscape ? 65 : 75 });
     }
 
     // (Moved to Signature Area)
