@@ -1,5 +1,7 @@
 {
   "version": 2,
+  "cleanUrls": true,
+  "trailingSlash": false,
   "rewrites": [
     {
       "source": "/v1/api/(.*)",
@@ -12,6 +14,22 @@
     {
       "source": "/r/(.*)",
       "destination": "/api/index.js"
+    },
+    {
+      "source": "/dashboard",
+      "destination": "/dashboard.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/login.html"
+    },
+    {
+      "source": "/student/dashboard",
+      "destination": "/student/dashboard.html"
+    },
+    {
+      "source": "/student/course",
+      "destination": "/student/course.html"
     }
   ]
 }
