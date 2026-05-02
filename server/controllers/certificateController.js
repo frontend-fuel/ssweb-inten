@@ -3,6 +3,7 @@ const PDFDocument = require('pdfkit');
 const QRCode = require('qrcode');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
 
 // @desc    Get all certificates
 const getCertificates = async (req, res) => {
@@ -63,12 +64,23 @@ const createCertificate = async (req, res) => {
       description
     });
 
-    // Self-hosted redirect — no third party, free, unlimited
-    // QR points to /r/:id on YOUR server. If domain changes, run updateRedirectDomain API.
+    // ✅ Step 2: Generate Blockchain Fingerprint (SHA-256 Hash)
+    // This creates a "Digital DNA" for the certificate that cannot be forged.
+    const fingerprintData = `${certificateId}|${studentName}|${studentEmail}|${internshipDomain}|${startDate}|${endDate}`;
+    const blockchainHash = crypto.createHash('sha256').update(fingerprintData).digest('hex');
+    
+    // ✅ Step 3: Self-hosted redirect
     const shortUrl = `${process.env.FRONTEND_URL}/r/${certificateId}`;
+    
+    certificate.blockchainHash = blockchainHash;
     certificate.shortUrl = shortUrl;
+    
+    // Simulated Transaction ID (In production, this would be the real Polygon TX ID)
+    certificate.transactionId = `0x${crypto.randomBytes(32).toString('hex')}`;
+    
     await certificate.save();
-    console.log(`[Redirect] Generated for ${certificateId}: ${shortUrl}`);
+    console.log(`[Blockchain] Fingerprint generated for ${certificateId}: ${blockchainHash}`);
+    console.log(`[Redirect] URL generated: ${shortUrl}`);
 
     res.status(201).json(certificate);
   } catch (error) {

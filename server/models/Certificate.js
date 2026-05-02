@@ -46,6 +46,19 @@ const certificateSchema = new mongoose.Schema({
   description: {
     type: String
   },
+  // Blockchain Verification Fields
+  blockchainHash: {
+    type: String,
+    unique: true,
+    sparse: true
+  },
+  transactionId: {
+    type: String
+  },
+  blockchainNetwork: {
+    type: String,
+    default: 'Polygon'
+  },
   shortUrl: {
     type: String,
     default: null

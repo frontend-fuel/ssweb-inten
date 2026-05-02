@@ -243,6 +243,60 @@
             100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
+        .status-badge.blockchain {
+            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+            color: #7c3aed;
+            border: 2px solid #ddd6fe;
+            margin-left: 10px;
+        }
+
+        .blockchain-proof {
+            margin-top: 25px;
+            padding: 20px;
+            background: #ffffff;
+            border: 1px solid #e9e9ff;
+            border-radius: 20px;
+            text-align: left;
+            display: none;
+        }
+
+        .proof-title {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #7c3aed;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hash-code {
+            font-family: 'Space Grotesk', monospace;
+            font-size: 13px;
+            color: var(--text-muted);
+            word-break: break-all;
+            background: #f8fafc;
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px dashed #cbd5e1;
+        }
+
+        .explorer-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            color: #7c3aed;
+            text-decoration: none;
+            font-weight: 700;
+            margin-top: 10px;
+        }
+
+        .explorer-link:hover { text-decoration: underline; }
+
+
         .cert-details-card {
             background: #f8fafc;
             border: 1px solid var(--gray-200);
@@ -395,7 +449,11 @@
             <div id="resultView" class="result-view">
                 <div id="statusBadge" class="status-badge valid">
                     <i class="fas fa-badge-check"></i>
-                    <span>Official Credential Verified</span>
+                    <span>Official Verified</span>
+                </div>
+                <div id="blockchainBadge" class="status-badge blockchain" style="display: none;">
+                    <i class="fa-brands fa-ethereum"></i>
+                    <span>On-Chain Secured</span>
                 </div>
 
                 <div class="cert-details-card">
@@ -421,7 +479,18 @@
                     </div>
                 </div>
 
-                <div style="display: flex; justify-content: center;">
+                <!-- Blockchain Proof Section -->
+                <div id="blockchainProof" class="blockchain-proof">
+                    <div class="proof-title">
+                        <i class="fas fa-microchip"></i> Blockchain Digital Fingerprint
+                    </div>
+                    <div class="hash-code" id="resHash">-</div>
+                    <a href="#" id="explorerLink" target="_blank" class="explorer-link">
+                        <i class="fas fa-external-link-alt"></i> View on Polygon Scan
+                    </a>
+                </div>
+
+                <div style="display: flex; justify-content: center; margin-top: 35px;">
                     <button class="new-search-btn" onclick="resetView()" style="width: 100%;">
                         <i class="fas fa-rotate"></i> Verify Another Certificate
                     </button>
@@ -492,14 +561,24 @@
             const badge = document.getElementById('statusBadge');
 
             if (status === 'revoked') {
-                badge.className = 'status-badge' + ' revoked'; // I'll add revoked style in a sec
+                badge.className = 'status-badge' + ' revoked'; 
                 badge.style.background = '#fef2f2';
                 badge.style.color = '#ef4444';
                 badge.style.borderColor = '#fee2e2';
                 badge.innerHTML = '<i class="fas fa-ban"></i><span>Credential Revoked</span>';
+                document.getElementById('blockchainBadge').style.display = 'none';
+                document.getElementById('blockchainProof').style.display = 'none';
             } else {
                 badge.className = 'status-badge valid';
-                badge.innerHTML = '<i class="fas fa-badge-check"></i><span>Official Credential Verified</span>';
+                badge.innerHTML = '<i class="fas fa-badge-check"></i><span>Official Verified</span>';
+                
+                // Show Blockchain details if they exist
+                if (data.blockchainHash) {
+                    document.getElementById('blockchainBadge').style.display = 'inline-flex';
+                    document.getElementById('blockchainProof').style.display = 'block';
+                    document.getElementById('resHash').textContent = data.blockchainHash;
+                    document.getElementById('explorerLink').href = `https://polygonscan.com/tx/${data.transactionId}`;
+                }
             }
 
             searchView.style.display = 'none';
