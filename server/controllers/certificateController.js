@@ -127,9 +127,12 @@ const generatePDF = async (req, res) => {
       return res.status(404).json({ message: 'Certificate not found' });
     }
 
+    const layout = req.query.layout === 'landscape' ? 'landscape' : 'portrait';
+    const isLandscape = layout === 'landscape';
+
     const doc = new PDFDocument({
-      layout: 'portrait',
       size: 'A4',
+      layout: layout,
       margin: 0
     });
 
@@ -163,71 +166,87 @@ const generatePDF = async (req, res) => {
     doc.path(`M ${doc.page.width - margin} ${doc.page.height - margin} L ${doc.page.width - margin - accentSize} ${doc.page.height - margin} L ${doc.page.width - margin} ${doc.page.height - margin - accentSize} Z`).fill('#1e3a8a');
 
     // 4. Logo Section
-    const logoPath = path.join(process.cwd(), 'logo100.png');
+    const logoPath = path.join(__dirname, '../../logo100.png');
     if (fs.existsSync(logoPath)) {
-      doc.image(logoPath, (doc.page.width - 200) / 2, 80, { width: 200 });
+      const logoWidth = isLandscape ? 160 : 200;
+      doc.image(logoPath, (doc.page.width - logoWidth) / 2, isLandscape ? 40 : 80, { width: logoWidth });
     }
 
     // 5. Text Content Section
-    doc.font('Helvetica-Bold').fontSize(24).fillColor('#1e3a8a').text('CERTIFICATE OF INTERNSHIP', 0, 200, { align: 'center', characterSpacing: 2 });
-    doc.font('Helvetica').fontSize(10.5).fillColor('#64748b').text('THIS IS PROUDLY PRESENTED TO', 0, 255, { align: 'center', characterSpacing: 3 });
+    const titleY = isLandscape ? 115 : 200;
+    doc.font('Helvetica-Bold').fontSize(isLandscape ? 28 : 24).fillColor('#1e3a8a').text('CERTIFICATE OF INTERNSHIP', 0, titleY, { align: 'center', characterSpacing: 2 });
+    doc.font('Helvetica').fontSize(11).fillColor('#64748b').text('THIS IS PROUDLY PRESENTED TO', 0, titleY + 40, { align: 'center', characterSpacing: 3 });
     
-    const nameY = 285;
+    const nameY = isLandscape ? 180 : 285;
     const nameText = certificate.studentName.toUpperCase();
-    doc.font('Helvetica-Bold').fontSize(28.5).fillColor('#0f172a').text(nameText, 0, nameY, { align: 'center' });
+    doc.font('Helvetica-Bold').fontSize(isLandscape ? 36 : 28.5).fillColor('#0f172a').text(nameText, 0, nameY, { align: 'center' });
 
     const textWidth = doc.widthOfString(nameText);
     const startX = (doc.page.width - textWidth) / 2;
-    doc.moveTo(startX - 20, nameY + 38).lineTo(startX + textWidth + 20, nameY + 38).strokeColor('#d4af37').lineWidth(3.5).stroke();
+    doc.moveTo(startX - 20, nameY + (isLandscape ? 42 : 38)).lineTo(startX + textWidth + 20, nameY + (isLandscape ? 42 : 38)).strokeColor('#d4af37').lineWidth(3.5).stroke();
 
-    doc.font('Helvetica').fontSize(11).fillColor('#334155').text(`has successfully completed an Internship as a`, 0, 365, { align: 'center' });
-    doc.font('Helvetica-Bold').fontSize(13.5).fillColor('#1e3a8a').text(`${certificate.internshipDomain.toUpperCase()} at SS WebTech.`, 0, 390, { align: 'center' });
+    const bodyY = isLandscape ? 255 : 365;
+    doc.font('Helvetica').fontSize(11).fillColor('#334155').text(`has successfully completed an Internship as a`, 0, bodyY, { align: 'center' });
+    doc.font('Helvetica-Bold').fontSize(isLandscape ? 15 : 13.5).fillColor('#1e3a8a').text(`${certificate.internshipDomain.toUpperCase()} at SS WebTech.`, 0, bodyY + 22, { align: 'center' });
 
     const start = new Date(certificate.startDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
     const end = new Date(certificate.endDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
-    doc.font('Helvetica-Bold').fontSize(11).fillColor('#475569').text(`Duration: ${start} to ${end}`, 0, 420, { align: 'center' });
+    doc.font('Helvetica-Bold').fontSize(11).fillColor('#475569').text(`Duration: ${start} to ${end}`, 0, bodyY + 50, { align: 'center' });
 
     const summary = certificate.description || "During the internship period, the student was involved in designing, developing, and maintaining web applications. Working sincerely with the team, demonstrating good technical skills, dedication, and enthusiasm towards learning.";
-    doc.font('Helvetica').fontSize(11).fillColor('#475569').text(summary, 80, 460, { align: 'center', lineGap: 6, width: doc.page.width - 160 });
+    doc.font('Helvetica').fontSize(isLandscape ? 11 : 11).fillColor('#475569').text(summary, 80, bodyY + 85, { align: 'center', lineGap: 4, width: doc.page.width - 160 });
 
     doc.font('Helvetica-Bold').fontSize(11).fillColor('#0f172a').text(`Performance during the internship was found to be satisfactory.`, 0, doc.y + 25, { align: 'center' });
 
     const issueDate = new Date(certificate.issueDate).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
     doc.font('Helvetica-Bold').fontSize(10).fillColor('#0f172a').text(`DATE: ${issueDate.toUpperCase()}`, 0, doc.y + 15, { align: 'center' });
 
-    // QR Code in Middle — use saved TinyURL (stable across domain changes)
+    // 6. Footer Layout Constants (Define early for use in QR positioning)
+    const footerY = doc.page.height - (isLandscape ? 95 : 150);
+    const paddingX = isLandscape ? 100 : 70;
+
+    // QR Code Section
     const verificationUrl = certificate.shortUrl || `${process.env.FRONTEND_URL}/verify.html?id=${certificate.certificateId}`;
     const qrCodeImage = await QRCode.toDataURL(verificationUrl, { margin: 1 });
     const qrBuffer = Buffer.from(qrCodeImage.split(',')[1], 'base64');
     
-    const qrWidth = 80;
-    const qrY = doc.y + 15;
-    doc.image(qrBuffer, (doc.page.width - qrWidth) / 2, qrY, { width: qrWidth });
+    const qrWidth = isLandscape ? 65 : 80;
+    const qrY = isLandscape ? footerY - 5 : (doc.y + 15);
+    const qrX = isLandscape ? paddingX + 200 : (doc.page.width - qrWidth) / 2;
+    doc.image(qrBuffer, qrX, qrY, { width: qrWidth });
     
-    // Position ID text below the QR code
-    doc.font('Courier').fontSize(8).fillColor('#64748b').text(`ID: ${certificate.certificateId}`, 0, qrY + qrWidth + 5, { align: 'center' });
+    // Position ID text below the QR code (In portrait or landscape)
+    doc.font('Courier').fontSize(isLandscape ? 7 : 8).fillColor('#64748b').text(`ID: ${certificate.certificateId}`, isLandscape ? qrX : 0, qrY + qrWidth + 4, { align: isLandscape ? 'left' : 'center', width: isLandscape ? qrWidth : doc.page.width });
 
     // 6. Footer Section
-    const footerY = doc.page.height - 150;
-    const paddingX = 70;
+    // (Constants already defined above)
 
-    const msmePath = path.join(process.cwd(), 'image.png');
+    const msmePath = path.join(__dirname, '../../image.png');
     if (fs.existsSync(msmePath)) {
       doc.image(msmePath, paddingX, footerY, { height: 75 });
     }
+
+    // (Moved to Signature Area)
 
     const signatureWidth = 160;
     const signatureX = doc.page.width - paddingX - signatureWidth;
     const signY = footerY + 45;
     
     // Digital Signature Image
-    const signaturePath = path.join(process.cwd(), 'signature.png');
+    const signaturePath = path.join(__dirname, '../../signature.png');
     if (fs.existsSync(signaturePath)) {
       doc.image(signaturePath, signatureX + 10, signY - 35, { width: 140 });
     }
     
     doc.moveTo(signatureX + 10, signY + 15).lineTo(signatureX + signatureWidth - 10, signY + 15).strokeColor('#94a3b8').lineWidth(1).stroke();
     doc.font('Helvetica-Bold').fontSize(9).fillColor('#64748b').text('FOUNDER & CEO', signatureX, signY + 22, { width: signatureWidth, align: 'center' });
+
+    // Official Stamp Image (Centered slightly above the signature line)
+    // Official Stamp Image (In place of Signature)
+    const stampPath = path.join(__dirname, '../../sswebtechstamp.png');
+    if (fs.existsSync(stampPath)) {
+      doc.image(stampPath, signatureX + 35, signY - 65, { width: 90 });
+    }
 
     doc.end();
 

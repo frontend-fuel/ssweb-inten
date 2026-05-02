@@ -80,8 +80,11 @@ function renderTable(certs) {
                     <a href="${API_URL}/certificates/${cert.certificateId}/pdf?preview=true" target="_blank" class="btn-icon" title="Preview" style="color: var(--success); background: #f0fdf4;">
                         <i class="fas fa-eye"></i>
                     </a>
-                    <a href="${API_URL}/certificates/${cert.certificateId}/pdf" target="_blank" class="btn-icon" title="Download" style="color: var(--primary); background: #eff6ff;">
-                        <i class="fas fa-download"></i>
+                    <a href="${API_URL}/certificates/${cert.certificateId}/pdf?layout=portrait" target="_blank" class="btn-icon" title="Portrait PDF" style="color: var(--primary); background: #eff6ff;">
+                        <i class="fas fa-file-invoice"></i>
+                    </a>
+                    <a href="${API_URL}/certificates/${cert.certificateId}/pdf?layout=landscape" target="_blank" class="btn-icon" title="Landscape PDF" style="color: #8b5cf6; background: #f3f0ff;">
+                        <i class="fas fa-file-alt"></i>
                     </a>
                     <button onclick="openEditModal('${cert.certificateId}')" class="btn-icon" title="Edit" style="color: var(--warning); background: #fffbeb;">
                         <i class="fas fa-edit"></i>
