@@ -70,7 +70,10 @@ const createCertificate = async (req, res) => {
     const blockchainHash = crypto.createHash('sha256').update(fingerprintData).digest('hex');
     
     // ✅ Step 3: Self-hosted redirect
-    const shortUrl = `${process.env.FRONTEND_URL}/r/${certificateId}`;
+    // Use FRONTEND_URL from env, or auto-detect from the current request host
+    const protocol = req.protocol === 'https' ? 'https' : 'http';
+    const host = process.env.FRONTEND_URL || `${protocol}://${req.get('host')}`;
+    const shortUrl = `${host}/r/${certificateId}`;
     
     certificate.blockchainHash = blockchainHash;
     certificate.shortUrl = shortUrl;
