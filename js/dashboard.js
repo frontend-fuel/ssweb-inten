@@ -77,8 +77,11 @@ function renderTable(certs) {
             </td>
             <td>
                 <div class="action-btns">
-                    <a href="${API_URL}/certificates/${cert.certificateId}/pdf?preview=true" target="_blank" class="btn-icon" title="Preview" style="color: var(--success); background: #f0fdf4;">
+                    <a href="${API_URL}/certificates/${cert.certificateId}/pdf?preview=true&layout=portrait" target="_blank" class="btn-icon" title="Portrait Preview" style="color: var(--success); background: #f0fdf4;">
                         <i class="fas fa-eye"></i>
+                    </a>
+                    <a href="${API_URL}/certificates/${cert.certificateId}/pdf?preview=true&layout=landscape" target="_blank" class="btn-icon" title="Landscape Preview" style="color: #10b981; background: #ecfdf5;">
+                        <i class="fas fa-window-maximize"></i>
                     </a>
                     <a href="${API_URL}/certificates/${cert.certificateId}/pdf?layout=portrait" target="_blank" class="btn-icon" title="Portrait PDF" style="color: var(--primary); background: #eff6ff;">
                         <i class="fas fa-file-invoice"></i>
