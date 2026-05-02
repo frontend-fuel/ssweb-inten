@@ -447,12 +447,6 @@
                 </div>
                 <div class="loader" id="loader"></div>
                 <div id="errorBox" style="display: none; margin-top: 25px; color: var(--error); font-weight: 700; font-size: 15px;"></div>
-                
-                <div style="margin-top: 35px; text-align: center;">
-                    <a href="/ledger" style="display: inline-flex; align-items: center; gap: 8px; color: var(--primary); font-weight: 700; text-decoration: none; font-size: 15px; padding: 10px 20px; background: var(--gray-100); border-radius: 20px; transition: 0.3s;">
-                        <i class="fas fa-globe"></i> View Public Certificate Ledger
-                    </a>
-                </div>
             </div>
 
             <!-- Result View -->
@@ -588,7 +582,7 @@
                     document.getElementById('blockchainBadge').style.display = 'inline-flex';
                     document.getElementById('blockchainProof').style.display = 'block';
                     document.getElementById('resHash').textContent = data.blockchainHash;
-                    document.getElementById('explorerLink').href = `/ledger.html?id=${data.certificateId}`;
+                    document.getElementById('explorerLink').href = `/ledger?id=${data.certificateId}`;
                 }
             }
 
