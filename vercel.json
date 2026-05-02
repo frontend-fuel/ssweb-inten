@@ -1,18 +1,17 @@
 {
   "version": 2,
   "cleanUrls": true,
-  "trailingSlash": false,
   "rewrites": [
     {
-      "source": "/v1/api/(.*)",
+      "source": "/v1/api/:path*",
       "destination": "/api/index.js"
     },
     {
-      "source": "/api/(.*)",
+      "source": "/api/:path*",
       "destination": "/api/index.js"
     },
     {
-      "source": "/r/(.*)",
+      "source": "/r/:path*",
       "destination": "/api/index.js"
     },
     {
@@ -20,16 +19,8 @@
       "destination": "/dashboard.html"
     },
     {
-      "source": "/login",
-      "destination": "/login.html"
-    },
-    {
       "source": "/student/dashboard",
       "destination": "/student/dashboard.html"
-    },
-    {
-      "source": "/student/course",
-      "destination": "/student/course.html"
     }
   ]
 }
