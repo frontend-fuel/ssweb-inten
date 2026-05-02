@@ -289,6 +289,76 @@
             margin-top: 20px;
         }
         .portal-footer a { color: var(--primary); text-decoration: none; font-weight: 600; }
+
+        /* Floating Action Button (FAB) */
+        .fab-container {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column-reverse;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .fab-main {
+            width: 60px;
+            height: 60px;
+            background: var(--dark);
+            color: white;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .fab-main:hover {
+            transform: scale(1.1) rotate(15deg);
+            background: #000;
+        }
+
+        .fab-options {
+            display: none;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 5px;
+            animation: fadeInScale 0.3s ease forwards;
+            transform-origin: bottom;
+        }
+
+        .fab-options.active {
+            display: flex;
+        }
+
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.5) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .fab-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+            transition: all 0.3s;
+            font-size: 20px;
+        }
+
+        .fab-btn:hover {
+            transform: translateY(-5px) scale(1.1);
+            filter: brightness(1.1);
+        }
     </style>
 </head>
 <body>
@@ -435,6 +505,21 @@
     </div>
 
 </div><!-- /portal-wrapper -->
+
+<div class="fab-container">
+    <div class="fab-options" id="fabOptions">
+        <a href="https://wa.me/919391502293" target="_blank" class="fab-btn" style="background: #25D366;" title="WhatsApp">
+            <i class="fab fa-whatsapp"></i>
+        </a>
+        <a href="tel:+919391502293" class="fab-btn" style="background: #3b82f6;" title="Call Us">
+            <i class="fas fa-phone"></i>
+        </a>
+        <a href="mailto:yarrusasi@gmail.com" class="fab-btn" style="background: #ea4335;" title="Email Us">
+            <i class="fas fa-envelope"></i>
+        </a>
+    </div>
+    <button class="fab-main" onclick="toggleFab()"><i class="fas fa-comment-dots" id="fabIcon"></i></button>
+</div>
 
 <script>
     // ─── Role Switcher ───────────────────────────────────────────────────────
@@ -606,6 +691,18 @@
     // ─── Auto-redirect if already logged in ──────────────────────────────────
     if (localStorage.getItem('adminToken'))   window.location.href = '/dashboard';
     if (localStorage.getItem('studentToken')) window.location.href = '/student/dashboard';
+
+    // ─── FAB Logic ────────────────────────────────────────────────────────────
+    function toggleFab() {
+        const options = document.getElementById('fabOptions');
+        const icon = document.getElementById('fabIcon');
+        options.classList.toggle('active');
+        if (options.classList.contains('active')) {
+            icon.className = 'fas fa-times';
+        } else {
+            icon.className = 'fas fa-comment-dots';
+        }
+    }
 </script>
 </body>
 </html>

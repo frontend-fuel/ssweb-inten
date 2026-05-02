@@ -415,3 +415,15 @@ document.getElementById('endDate').addEventListener('change', updateDuration);
 // Initial fetch
 fetchData();
 
+// FAB Logic
+function toggleFab() {
+    const options = document.getElementById('fabOptions');
+    const icon = document.getElementById('fabIcon');
+    options.classList.toggle('active');
+    if (options.classList.contains('active')) {
+        icon.className = 'fas fa-times';
+    } else {
+        icon.className = 'fas fa-comment-dots';
+    }
+}
+
