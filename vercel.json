@@ -3,18 +3,18 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "functions": {
-    "api/index.js": {
+    "api/server.js": {
       "includeFiles": "*.png"
     }
   },
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/api/index.js"
+      "destination": "/api/server.js"
     },
     {
       "source": "/r/(.*)",
-      "destination": "/api/index.js"
+      "destination": "/api/server.js"
     }
   ],
   "headers": [

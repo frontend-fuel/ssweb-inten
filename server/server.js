@@ -41,12 +41,14 @@ app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, '../dashbo
 app.get('/verify', (req, res) => res.sendFile(path.join(__dirname, '../verify.html')));
 
 // ✅ Self-Hosted Certificate Redirect — QR codes point here
-// If domain changes → run PUT /api/certificates/update-domain to update all DB records instantly
-// This route will ALWAYS exist on your server regardless of domain name
-app.get('/r/:id', (req, res) => {
+const handleRedirect = (req, res) => {
   const certId = req.params.id;
+  console.log(`[Redirect] Routing ID ${certId} to verification page`);
   res.redirect(301, `/verify.html?id=${certId}`);
-});
+};
+
+app.get('/r/:id', handleRedirect);
+app.get('/api/r/:id', handleRedirect); // Safety fallback
 
 // Student Frontend routes (login & register now on index.html)
 app.get('/student/login', (req, res) => res.redirect('/'));
