@@ -555,7 +555,8 @@
         function showStatus(status, data) {
             document.getElementById('resName').textContent = data.studentName;
             document.getElementById('resDomain').textContent = data.internshipDomain;
-            document.getElementById('resDuration').textContent = data.duration;
+            const duration = data.duration || '';
+            document.getElementById('resDuration').textContent = duration.toLowerCase().includes('month') ? duration : `${duration} Months`;
             document.getElementById('resId').textContent = data.certificateId;
 
             const badge = document.getElementById('statusBadge');

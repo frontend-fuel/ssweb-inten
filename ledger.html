@@ -335,11 +335,11 @@
                 </div>
                 <div class="detail-item">
                     <label>Internship Domain</label>
-                    <p id="domain">-</p>
+                    <p id="resDomain">-</p>
                 </div>
                 <div class="detail-item">
-                    <label>Timestamp</label>
-                    <p id="timestamp">-</p>
+                    <label>Internship Duration</label>
+                    <p id="resDuration">-</p>
                 </div>
             </div>
 
@@ -385,8 +385,8 @@
                 document.getElementById('blockchainHash').textContent = data.blockchainHash || 'GENESIS_HASH_PENDING';
                 document.getElementById('certId').textContent = data.certificateId;
                 document.getElementById('studentName').textContent = data.studentName;
-                document.getElementById('domain').textContent = data.internshipDomain;
-                document.getElementById('timestamp').textContent = new Date(data.createdAt).toUTCString();
+                document.getElementById('resDomain').textContent = data.internshipDomain;
+                document.getElementById('resDuration').textContent = data.duration.toLowerCase().includes('month') ? data.duration : `${data.duration} Months`;
 
                 document.getElementById('loader').style.display = 'none';
 
