@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Allow: /verify
+Disallow: /v1/api/
+
+Sitemap: https://sswebtechintern.vercel.app/sitemap.xml
