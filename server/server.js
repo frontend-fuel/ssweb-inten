@@ -9,6 +9,7 @@ const adminRoutes = require('./routes/adminRoutes');
 const certificateRoutes = require('./routes/certificateRoutes');
 const studentRoutes = require('./routes/studentRoutes');
 const lmsRoutes = require('./routes/lmsRoutes');
+const offerLetterRoutes = require('./routes/offerLetterRoutes');
 
 // Load env vars
 dotenv.config({ path: path.join(__dirname, '../.env') });
@@ -25,6 +26,7 @@ app.use('/v1/api/admin', adminRoutes);
 app.use('/v1/api/certificates', certificateRoutes);
 app.use('/v1/api/students', studentRoutes);
 app.use('/v1/api/lms', lmsRoutes);
+app.use('/v1/api/offers', offerLetterRoutes);
 
 // Static folder for frontend
 app.use(express.static(path.join(__dirname, '..')));

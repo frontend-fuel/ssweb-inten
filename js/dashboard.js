@@ -7,6 +7,12 @@ if (!token) {
 const userName = localStorage.getItem('adminUsername') || 'Admin';
 document.getElementById('userName').textContent = userName;
 document.getElementById('userInitial').textContent = userName.charAt(0).toUpperCase();
+if (document.getElementById('adminSidebarName')) {
+    document.getElementById('adminSidebarName').textContent = userName;
+}
+if (document.querySelector('.sidebar-user-card .user-avatar-small')) {
+    document.querySelector('.sidebar-user-card .user-avatar-small').textContent = userName.charAt(0).toUpperCase();
+}
 
 // DOM Elements
 const certsTableBody = document.getElementById('certsTableBody');
@@ -56,6 +62,9 @@ function updateStats(stats) {
     totalCertsEl.textContent = stats.totalCertificates || 0;
     activeCertsEl.textContent = stats.activeCertificates || 0;
     revokedCertsEl.textContent = stats.revokedCertificates || 0;
+    if (document.getElementById('totalOffers')) {
+        document.getElementById('totalOffers').textContent = stats.totalOffers || 0;
+    }
 }
 
 function renderTable(certs) {
@@ -256,10 +265,17 @@ navItems.forEach(item => {
         if (tabId === 'students') {
             document.getElementById('certificatesTab').style.display = 'none';
             document.getElementById('studentsTab').style.display = 'block';
+            document.getElementById('offersTab').style.display = 'none';
             fetchStudents();
+        } else if (tabId === 'offers') {
+            document.getElementById('certificatesTab').style.display = 'none';
+            document.getElementById('studentsTab').style.display = 'none';
+            document.getElementById('offersTab').style.display = 'block';
+            fetchOfferLetters();
         } else {
             document.getElementById('certificatesTab').style.display = 'block';
             document.getElementById('studentsTab').style.display = 'none';
+            document.getElementById('offersTab').style.display = 'none';
             fetchData();
         }
     });
@@ -433,3 +449,218 @@ function toggleFab() {
     }
 }
 
+// --- Offer Letter Logic ---
+
+const offerModal = document.getElementById('offerModal');
+const offerForm = document.getElementById('offerForm');
+const offersTableBody = document.getElementById('offersTableBody');
+
+async function fetchOfferLetters() {
+    try {
+        const res = await fetch(`${API_URL}/offers`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.status === 401) {
+            handleLogout();
+            return;
+        }
+        const offers = await res.json();
+        renderOffersTable(offers);
+    } catch (error) {
+        console.error('Error fetching offer letters:', error);
+    }
+}
+
+function renderOffersTable(offers) {
+    if (!offers || offers.length === 0) {
+        offersTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--text-muted);">No offer letters found.</td></tr>';
+        return;
+    }
+
+    offersTableBody.innerHTML = offers.map(offer => `
+        <tr>
+            <td class="cert-id-cell">${offer.offerId}</td>
+            <td style="font-weight: 800; color: var(--dark);">${offer.studentName}<br><small style="font-weight: 400; color: var(--text-muted);">${offer.studentEmail}</small></td>
+            <td style="color: var(--text-muted);">${offer.internshipDomain}</td>
+            <td style="color: var(--text-muted); font-weight: 500;">${offer.duration}</td>
+            <td>
+                <span class="status-badge ${offer.status === 'Active' ? 'status-active' : 'status-revoked'}">
+                    ${offer.status}
+                </span>
+            </td>
+            <td>
+                <div class="action-btns">
+                    <a href="${API_URL}/offers/${offer.offerId}/pdf?preview=true" target="_blank" class="btn-icon" title="Preview PDF" style="color: var(--success); background: #f0fdf4;">
+                        <i class="fa-solid fa-eye"></i>
+                    </a>
+                    <a href="${API_URL}/offers/${offer.offerId}/pdf" target="_blank" class="btn-icon" title="Download PDF" style="color: var(--primary); background: #eff6ff;">
+                        <i class="fa-solid fa-download"></i>
+                    </a>
+                    <button onclick="openOfferEditModal('${offer.offerId}')" class="btn-icon" title="Edit" style="color: var(--warning); background: #fffbeb;">
+                        <i class="fa-solid fa-edit"></i>
+                    </button>
+                    <button onclick="deleteOffer('${offer.offerId}')" class="btn-icon" title="Delete" style="color: var(--error); background: #fef2f2;">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function openOfferModal(isEdit = false) {
+    offerModal.classList.add('active');
+    offerModal.style.display = 'flex';
+    if (!isEdit) {
+        document.getElementById('offerModalTitle').textContent = 'Create Offer Letter';
+        offerForm.reset();
+        document.getElementById('editOfferId').value = '';
+        document.getElementById('offerStatusGroup').style.display = 'none';
+        document.getElementById('offerStipend').value = 'Unpaid';
+    } else {
+        document.getElementById('offerModalTitle').textContent = 'Edit Offer Letter';
+        document.getElementById('offerStatusGroup').style.display = 'block';
+    }
+}
+
+function closeOfferModal() {
+    offerModal.classList.remove('active');
+    setTimeout(() => {
+        offerModal.style.display = 'none';
+    }, 300);
+}
+
+document.getElementById('newOfferBtn').onclick = () => openOfferModal(false);
+document.getElementById('closeOfferOfferModal').onclick = closeOfferModal;
+document.getElementById('cancelOfferBtn').onclick = closeOfferModal;
+
+window.onclick = (event) => {
+    if (event.target === certModal) closeModal();
+    if (event.target === offerModal) closeOfferModal();
+};
+
+window.openOfferEditModal = async (id) => {
+    try {
+        const res = await fetch(`${API_URL}/offers/${id}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const offer = await res.json();
+        
+        document.getElementById('editOfferId').value = offer.offerId;
+        document.getElementById('offerStudentName').value = offer.studentName;
+        document.getElementById('offerStudentEmail').value = offer.studentEmail;
+        document.getElementById('offerDomain').value = offer.internshipDomain;
+        document.getElementById('offerDuration').value = offer.duration.split(' ')[0];
+        document.getElementById('offerStartDate').value = offer.startDate.split('T')[0];
+        document.getElementById('offerEndDate').value = offer.endDate.split('T')[0];
+        document.getElementById('offerStipend').value = offer.stipend;
+        document.getElementById('offerIssueDate').value = offer.issueDate ? offer.issueDate.split('T')[0] : '';
+        document.getElementById('offerStatus').value = offer.status;
+        
+        openOfferModal(true);
+    } catch (error) {
+        alert('Error fetching offer letter details');
+    }
+};
+
+offerForm.onsubmit = async (e) => {
+    e.preventDefault();
+    const saveBtn = document.getElementById('saveOfferBtn');
+    const originalText = saveBtn.innerHTML;
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = 'Saving...';
+
+    const id = document.getElementById('editOfferId').value;
+    const durationValue = document.getElementById('offerDuration').value;
+    const durationFormatted = durationValue == 1 ? "1 Month" : `${durationValue} Months`;
+
+    const data = {
+        studentName: document.getElementById('offerStudentName').value,
+        studentEmail: document.getElementById('offerStudentEmail').value,
+        internshipDomain: document.getElementById('offerDomain').value,
+        duration: durationFormatted,
+        startDate: document.getElementById('offerStartDate').value,
+        endDate: document.getElementById('offerEndDate').value,
+        stipend: document.getElementById('offerStipend').value,
+        issueDate: document.getElementById('offerIssueDate').value || null,
+        status: document.getElementById('offerStatus').value
+    };
+
+    try {
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? `${API_URL}/offers/${id}` : `${API_URL}/offers`;
+        
+        const res = await fetch(url, {
+            method,
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(data)
+        });
+
+        if (res.ok) {
+            closeOfferModal();
+            fetchOfferLetters();
+        } else {
+            const err = await res.json();
+            alert(err.message || 'Operation failed');
+        }
+    } catch (error) {
+        alert('Server connection failed');
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = originalText;
+    }
+};
+
+window.deleteOffer = async (id) => {
+    if (confirm(`Are you sure you want to delete offer letter ${id}?`)) {
+        try {
+            const res = await fetch(`${API_URL}/offers/${id}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+                fetchOfferLetters();
+            } else {
+                alert('Failed to delete');
+            }
+        } catch (error) {
+            alert('Server connection failed');
+        }
+    }
+};
+
+// Sync duration for offer letter
+document.getElementById('offerStartDate').addEventListener('change', () => {
+    const start = document.getElementById('offerStartDate').value;
+    const end = document.getElementById('offerEndDate').value;
+    if (start && end) {
+        const d1 = new Date(start);
+        const d2 = new Date(end);
+        let months = (d2.getFullYear() - d1.getFullYear()) * 12;
+        months -= d1.getMonth();
+        months += d2.getMonth();
+        const dayDiff = d2.getDate() - d1.getDate();
+        if (dayDiff >= 15) months++;
+        if (months < 1) months = 1;
+        document.getElementById('offerDuration').value = months;
+    }
+});
+
+document.getElementById('offerEndDate').addEventListener('change', () => {
+    const start = document.getElementById('offerStartDate').value;
+    const end = document.getElementById('offerEndDate').value;
+    if (start && end) {
+        const d1 = new Date(start);
+        const d2 = new Date(end);
+        let months = (d2.getFullYear() - d1.getFullYear()) * 12;
+        months -= d1.getMonth();
+        months += d2.getMonth();
+        const dayDiff = d2.getDate() - d1.getDate();
+        if (dayDiff >= 15) months++;
+        if (months < 1) months = 1;
+        document.getElementById('offerDuration').value = months;
+    }
+});

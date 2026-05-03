@@ -1,4 +1,5 @@
 const Certificate = require('../models/Certificate');
+const OfferLetter = require('../models/OfferLetter');
 const PDFDocument = require('pdfkit');
 const QRCode = require('qrcode');
 const fs = require('fs');
@@ -198,13 +199,13 @@ const generatePDF = async (req, res) => {
     doc.font('Helvetica-Bold').fontSize(isLandscape ? 32 : 24).fillColor('#1e3a8a').text('CERTIFICATE OF INTERNSHIP', 0, titleY, { align: 'center', characterSpacing: 2 });
     doc.font('Helvetica').fontSize(isLandscape ? 12 : 12).fillColor('#64748b').text('THIS IS PROUDLY PRESENTED TO', 0, titleY + (isLandscape ? 40 : 55), { align: 'center', characterSpacing: 3 });
     
-    const nameY = isLandscape ? 200 : 285;
+    const nameY = isLandscape ? 215 : 300;
     const nameText = certificate.studentName.toUpperCase();
-    doc.font('Helvetica-Bold').fontSize(isLandscape ? 48 : 28.5).fillColor('#0f172a').text(nameText, 0, nameY, { align: 'center' });
+    doc.font('Helvetica-Bold').fontSize(isLandscape ? 28 : 28.5).fillColor('#0f172a').text(nameText, 0, nameY, { align: 'center' });
 
     const textWidth = doc.widthOfString(nameText);
     const startX = (doc.page.width - textWidth) / 2;
-    doc.moveTo(startX - 20, nameY + (isLandscape ? 52 : 38)).lineTo(startX + textWidth + 20, nameY + (isLandscape ? 52 : 38)).strokeColor('#d4af37').lineWidth(4).stroke();
+    doc.moveTo(startX - 20, nameY + (isLandscape ? 32 : 38)).lineTo(startX + textWidth + 20, nameY + (isLandscape ? 32 : 38)).strokeColor('#d4af37').lineWidth(4).stroke();
 
     const bodyY = isLandscape ? 280 : 365;
     doc.font('Helvetica').fontSize(isLandscape ? 12 : 12).fillColor('#334155').text(`has successfully completed an Internship as a`, 0, bodyY, { align: 'center' });
@@ -284,12 +285,15 @@ const getDashboardStats = async (req, res) => {
     const revokedCertificates = await Certificate.countDocuments({ status: 'Revoked' });
     const recentCertificates = await Certificate.find({}).sort({ createdAt: -1 }).limit(5);
 
+    const totalOffers = await OfferLetter.countDocuments();
+    
     console.log('Stats calculated successfully');
     res.json({
       totalCertificates,
       activeCertificates,
       revokedCertificates,
-      recentCertificates
+      recentCertificates,
+      totalOffers
     });
   } catch (error) {
     console.error('Error fetching dashboard stats:', error);

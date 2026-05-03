@@ -59,9 +59,12 @@
             border: 1px solid var(--gray-border);
             display: flex;
             flex-direction: column;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            height: calc(100vh - 40px);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
             z-index: 50;
             animation: slideInLeft 0.6s ease-out;
+            position: sticky;
+            top: 20px;
         }
 
         @keyframes slideInLeft {
@@ -70,38 +73,40 @@
         }
 
         .sidebar-header {
-            padding: 35px 24px;
+            padding: 30px 24px 20px;
             text-align: center;
-            border-bottom: 1px solid var(--gray-light);
         }
 
         .sidebar-header img {
-            height: 50px;
+            height: 40px;
+            transition: transform 0.3s ease;
         }
 
         .nav-list {
             list-style: none;
-            padding: 25px 15px;
+            padding: 0 15px;
             flex: 1;
         }
 
         .nav-item {
             display: flex;
             align-items: center;
-            padding: 14px 20px;
+            padding: 12px 16px;
             color: var(--text-muted);
             text-decoration: none;
-            font-weight: 700;
-            font-size: 14px;
-            gap: 15px;
+            font-weight: 600;
+            font-size: 14.5px;
+            gap: 12px;
             border-radius: 14px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            margin-bottom: 8px;
+            transition: all 0.25s ease;
+            margin-bottom: 6px;
             cursor: pointer;
         }
 
         .nav-item i {
-            font-size: 18px;
+            font-size: 17px;
+            width: 24px;
+            text-align: center;
         }
 
         .nav-item:hover {
@@ -112,11 +117,11 @@
         .nav-item.active {
             color: #ffffff;
             background: var(--dark);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 20px -5px rgba(15, 23, 42, 0.3);
         }
 
         .sidebar-footer {
-            padding: 25px;
+            padding: 20px;
             border-top: 1px solid var(--gray-light);
         }
 
@@ -125,11 +130,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: var(--error);
-            background: #fef2f2;
-            border: 1px solid #fee2e2;
+            color: #ef4444;
+            background: #fff;
+            border: 1.5px solid #fee2e2;
             padding: 12px;
-            border-radius: 12px;
+            border-radius: 14px;
             cursor: pointer;
             font-size: 14px;
             font-weight: 700;
@@ -138,9 +143,11 @@
         }
 
         .btn-logout:hover {
-            background: var(--error);
-            color: #ffffff;
+            background: #fef2f2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1);
         }
+
 
         /* Main Content Area */
         main {
@@ -573,6 +580,7 @@
         <div class="sidebar-header">
             <img src="/logo100.png" alt="SS WebTech">
         </div>
+
         <nav class="nav-list">
             <div class="nav-item active" data-tab="dashboard">
                 <i class="fas fa-th-large"></i>
@@ -589,6 +597,10 @@
             <div class="nav-item" data-tab="certificates">
                 <i class="fas fa-award"></i>
                 <span>Certificates</span>
+            </div>
+            <div class="nav-item" data-tab="offer-letters">
+                <i class="fas fa-envelope-open-text"></i>
+                <span>Offer Letters</span>
             </div>
             <div class="nav-item" data-tab="profile">
                 <i class="fas fa-user-circle"></i>
@@ -688,6 +700,33 @@
                 </table>
             </div>
         </section>
+        
+        <!-- Offer Letters Tab -->
+        <section id="offer-letters" class="tab-content">
+            <header>
+                <div class="header-title">
+                    <h1>My Offer Letters</h1>
+                    <p>View and download your internship offer letters.</p>
+                </div>
+            </header>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Offer ID</th>
+                            <th>Domain</th>
+                            <th>Duration</th>
+                            <th>Date Issued</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="offersTableBody">
+                        <tr><td colspan="6" style="text-align: center; padding: 50px;">No offer letters found yet.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
         <!-- Profile Tab -->
         <section id="profile" class="tab-content">
@@ -778,6 +817,7 @@
                     if (tab.id === targetTab) tab.classList.add('active');
                 });
                 if (targetTab === 'certificates') loadCertificates();
+                if (targetTab === 'offer-letters') loadOfferLetters();
                 if (targetTab === 'profile') loadProfile();
             });
         });
@@ -948,6 +988,45 @@
                 btn.innerHTML = '<i class="fas fa-key"></i> Update Password';
             }
         };
+
+        async function loadOfferLetters() {
+            const tableBody = document.getElementById('offersTableBody');
+            tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 50px;"><i class="fas fa-spinner fa-spin"></i> Loading...</td></tr>';
+            
+            try {
+                const res = await fetch('/v1/api/students/offers', {
+                    headers: { 'Authorization': `Bearer ${studentToken}` }
+                });
+                const data = await res.json();
+                
+                if (!data || data.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 50px;">No offer letters found yet.</td></tr>';
+                    return;
+                }
+
+                tableBody.innerHTML = data.map(offer => `
+                    <tr>
+                        <td style="color: var(--primary); font-family: monospace;">${offer.offerId}</td>
+                        <td>${offer.internshipDomain}</td>
+                        <td>${offer.duration}</td>
+                        <td>${new Date(offer.issueDate).toLocaleDateString()}</td>
+                        <td><span style="color: ${offer.status === 'Active' ? 'var(--success)' : 'var(--error)'}">${offer.status}</span></td>
+                        <td>
+                            <div style="display: flex; gap: 8px;">
+                                <a href="/v1/api/offers/${offer.offerId}/pdf?preview=true" target="_blank" class="btn-submit" style="padding: 8px 12px; font-size: 12px; text-decoration: none; width: auto; background: var(--primary-soft); color: var(--primary);">
+                                    <i class="fas fa-eye"></i> View
+                                </a>
+                                <a href="/v1/api/offers/${offer.offerId}/pdf" target="_blank" class="btn-submit" style="padding: 8px 12px; font-size: 12px; text-decoration: none; width: auto;">
+                                    <i class="fas fa-download"></i> Download
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                tableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 50px; color: var(--error);">Error loading offer letters.</td></tr>';
+            }
+        }
 
         loadData();
 

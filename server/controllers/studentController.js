@@ -109,6 +109,18 @@ const changePassword = async (req, res) => {
   }
 };
 
+// @desc    Get student offer letters
+// @route   GET /api/students/offers
+const getStudentOfferLetters = async (req, res) => {
+  const OfferLetter = require('../models/OfferLetter');
+  try {
+    const offers = await OfferLetter.find({ studentEmail: req.student.email }).sort({ createdAt: -1 });
+    res.json(offers);
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error', error: error.message });
+  }
+};
+
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '30d' });
 };
@@ -118,5 +130,6 @@ module.exports = {
   loginStudent,
   getStudentProfile,
   getStudentCertificates,
+  getStudentOfferLetters,
   changePassword
 };
