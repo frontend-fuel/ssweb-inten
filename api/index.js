@@ -9,6 +9,7 @@ const adminRoutes = require('../server/routes/adminRoutes');
 const certificateRoutes = require('../server/routes/certificateRoutes');
 const studentRoutes = require('../server/routes/studentRoutes');
 const lmsRoutes = require('../server/routes/lmsRoutes');
+const offerLetterRoutes = require('../server/routes/offerLetterRoutes');
 
 // Load env vars
 dotenv.config({ path: path.join(__dirname, '../.env') });
@@ -58,6 +59,7 @@ mountRoutes('/admin', adminRoutes);
 mountRoutes('/certificates', certificateRoutes);
 mountRoutes('/students', studentRoutes);
 mountRoutes('/lms', lmsRoutes);
+mountRoutes('/offers', offerLetterRoutes);
 
 // Frontend routes
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, '../index.html')));

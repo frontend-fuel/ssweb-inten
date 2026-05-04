@@ -68,7 +68,7 @@ function updateStats(stats) {
 }
 
 function renderTable(certs) {
-    if (!certs || certs.length === 0) {
+    if (!Array.isArray(certs) || certs.length === 0) {
         certsTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: rgba(255,255,255,0.4);">No certificates found. Generate your first one!</td></tr>';
         return;
     }
@@ -304,7 +304,7 @@ function updateStudentStats(students) {
 
 function renderStudentsTable(students) {
     const body = document.getElementById('studentsTableBody');
-    if (!students || students.length === 0) {
+    if (!Array.isArray(students) || students.length === 0) {
         body.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px; color: var(--text-muted);">No students registered yet.</td></tr>';
         return;
     }
@@ -472,7 +472,7 @@ async function fetchOfferLetters() {
 }
 
 function renderOffersTable(offers) {
-    if (!offers || offers.length === 0) {
+    if (!Array.isArray(offers) || offers.length === 0) {
         offersTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--text-muted);">No offer letters found.</td></tr>';
         return;
     }
